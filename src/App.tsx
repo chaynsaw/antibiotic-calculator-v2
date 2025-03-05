@@ -397,7 +397,7 @@ export function App() {
       </main>
       <footer className="py-4 px-6 text-center text-sm text-slate-400">
         <p>
-          © 2024 Antibiotic Waste Calculator • Helping reduce environmental
+          © 2025 Antibiotic Waste Calculator • Helping reduce environmental
           impact in healthcare
         </p>
       </footer>
