@@ -2,7 +2,7 @@
   "name": "antibiotic-calculator-v2",
   "private": true,
   "version": "0.0.0",
-  "homepage": "https://YOUR_GITHUB_USERNAME.github.io/antibiotic-calculator-v2",
+  "homepage": "https://chaynsaw.github.io/antibiotic-calculator-v2",
   "type": "module",
   "scripts": {
     "dev": "vite",
