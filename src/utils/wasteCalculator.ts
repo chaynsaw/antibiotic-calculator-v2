@@ -5,10 +5,18 @@ export interface WasteItem {
   totalWaste: number;
 }
 
+export interface DrugDoseRange {
+  minDose: number;
+  maxDose: number;
+  form: string;
+  methods: string[];
+}
+
 export interface DrugOption {
   name: string;
   doses: {
-    dose: string;
+    dose: string | null;  // null for variable doses
+    doseRanges?: DrugDoseRange[];  // present for variable doses, now an array of ranges
     forms: {
       form: string;
       methods: string[];
@@ -55,23 +63,19 @@ export async function getAvailableDrugs(): Promise<DrugOption[]> {
     );
     
     // Skip header row
-    const drugMap = new Map<string, Map<string, Map<string, Set<string>>>>();
+    const drugMap = new Map<string, Map<string | null, Map<string, Set<string>>>>();
     
     // Start from row 1 to skip header
     for (let i = 1; i < rows.length; i++) {
       const row = rows[i];
       const drug = row[0]?.trim();
-      const dose = row[1]?.trim();
-      const minDose = row[3]?.trim();
-      const maxDose = row[4]?.trim();
+      const fixedDose = row[1]?.trim();
+      const minDose = row[2]?.trim();
+      const maxDose = row[3]?.trim();
       const form = row[5]?.trim();
       const method = row[6]?.trim();
       
-      // Only process fixed dose entries (empty min/max dose)
-      if (drug && dose && form && method) {
-        // Skip if both min and max dose are filled
-        if (minDose && maxDose) continue;
-        
+      if (drug && form && method) {
         // Initialize drug if not exists
         if (!drugMap.has(drug)) {
           drugMap.set(drug, new Map());
@@ -79,20 +83,29 @@ export async function getAvailableDrugs(): Promise<DrugOption[]> {
         
         const doseMap = drugMap.get(drug)!;
         
-        // Initialize dose if not exists
-        if (!doseMap.has(dose)) {
-          doseMap.set(dose, new Map());
+        // Handle fixed dose case
+        if (fixedDose && !(minDose && maxDose)) {
+          if (!doseMap.has(fixedDose)) {
+            doseMap.set(fixedDose, new Map());
+          }
+          const formMap = doseMap.get(fixedDose)!;
+          if (!formMap.has(form)) {
+            formMap.set(form, new Set());
+          }
+          formMap.get(form)!.add(method);
         }
-        
-        const formMap = doseMap.get(dose)!;
-        
-        // Initialize form if not exists
-        if (!formMap.has(form)) {
-          formMap.set(form, new Set());
+        // Handle variable dose case
+        else if (minDose && maxDose) {
+          const doseKey = null; // Use null to represent variable dose
+          if (!doseMap.has(doseKey)) {
+            doseMap.set(doseKey, new Map());
+          }
+          const formMap = doseMap.get(doseKey)!;
+          if (!formMap.has(form)) {
+            formMap.set(form, new Set());
+          }
+          formMap.get(form)!.add(method);
         }
-        
-        // Add method to form
-        formMap.get(form)!.add(method);
       }
     }
     
@@ -112,16 +125,98 @@ export async function getAvailableDrugs(): Promise<DrugOption[]> {
           });
         }
         
-        doses.push({
-          dose,
-          forms: forms.sort((a, b) => a.form.localeCompare(b.form))
-        });
+        // If dose is null, find all distinct dose ranges from the CSV
+        if (dose === null) {
+          const drugRows = rows.filter(row => 
+            row[0]?.trim() === drugName && 
+            row[2]?.trim() &&
+            row[3]?.trim()
+          );
+          
+          if (drugRows.length > 0) {
+            // Group rows by form
+            const formGroups = new Map<string, { minDose: number, maxDose: number, methods: Set<string> }[]>();
+            
+            for (const row of drugRows) {
+              const form = row[5]?.trim() || '';
+              const minDoseStr = row[2]?.trim() || '0';
+              const maxDoseStr = row[3]?.trim() || '0';
+              const method = row[6]?.trim() || '';
+              
+              // Parse doses as numbers and validate
+              const minDose = parseFloat(minDoseStr);
+              const maxDose = parseFloat(maxDoseStr);
+              
+              // Skip invalid rows or rows with NaN values
+              if (isNaN(minDose) || isNaN(maxDose) || !form || !method) continue;
+              
+              if (!formGroups.has(form)) {
+                formGroups.set(form, []);
+              }
+              
+              const ranges = formGroups.get(form)!;
+              let found = false;
+              
+              // Try to find an existing range that matches
+              for (const range of ranges) {
+                if (range.minDose === minDose && range.maxDose === maxDose) {
+                  range.methods.add(method);
+                  found = true;
+                  break;
+                }
+              }
+              
+              // If no matching range found, create a new one
+              if (!found) {
+                ranges.push({
+                  minDose,
+                  maxDose,
+                  methods: new Set([method])
+                });
+              }
+            }
+            
+            // Convert the ranges to the final format
+            const doseRanges: DrugDoseRange[] = [];
+            
+            for (const [form, ranges] of formGroups) {
+              // Sort ranges by minDose
+              ranges.sort((a, b) => a.minDose - b.minDose);
+              
+              // Convert each range directly without merging
+              for (const range of ranges) {
+                doseRanges.push({
+                  minDose: range.minDose,
+                  maxDose: range.maxDose,
+                  form,
+                  methods: Array.from(range.methods).sort()
+                });
+              }
+            }
+            
+            // Sort all ranges by minDose
+            doseRanges.sort((a, b) => a.minDose - b.minDose);
+            
+            doses.push({
+              dose: null,
+              doseRanges,
+              forms: forms.sort((a, b) => a.form.localeCompare(b.form))
+            });
+          }
+        } else {
+          doses.push({
+            dose,
+            forms: forms.sort((a, b) => a.form.localeCompare(b.form))
+          });
+        }
       }
       
+      // Sort doses: fixed doses first (numerically), then variable dose
       drugs.push({
         name: drugName,
         doses: doses.sort((a, b) => {
-          // Extract numeric part for comparison
+          if (a.dose === null) return 1;
+          if (b.dose === null) return -1;
           const numA = parseFloat(a.dose.split('/')[0]);
           const numB = parseFloat(b.dose.split('/')[0]);
           return numA - numB;
@@ -136,7 +231,7 @@ export async function getAvailableDrugs(): Promise<DrugOption[]> {
   }
 }
 
-export async function getWasteItems(drug: string, dose: string, method: string): Promise<WasteItem[]> {
+export async function getWasteItems(drug: string, dose: string | number, method: string): Promise<WasteItem[]> {
   try {
     // Load both data sources
     const [response, weights] = await Promise.all([
@@ -155,11 +250,20 @@ export async function getWasteItems(drug: string, dose: string, method: string):
     const headers = rows[0];
     
     // Find matching row for the drug
-    const matchingRows = rows.filter(row => 
-      row[0]?.trim() === drug && 
-      row[1]?.trim() === dose &&  // Fixed Dose column
-      row[6]?.trim() === method   // How supplied column
-    );
+    const matchingRows = rows.filter(row => {
+      const drugMatch = row[0]?.trim() === drug;
+      const methodMatch = row[6]?.trim() === method;
+      
+      // For fixed doses, match exactly
+      if (typeof dose === 'string') {
+        return drugMatch && row[1]?.trim() === dose && methodMatch;
+      }
+      
+      // For variable doses, check if within min/max range
+      const minDose = parseFloat(row[2]?.trim() || '0');
+      const maxDose = parseFloat(row[3]?.trim() || '0');
+      return drugMatch && dose >= minDose && dose <= maxDose && methodMatch;
+    });
     
     if (!matchingRows.length) {
       throw new Error(`Data not found for ${drug} ${dose}mg with method: ${method}`);

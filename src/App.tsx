@@ -1,15 +1,17 @@
 import { useState, useEffect } from "react";
-import { ChevronDown, Leaf, Pill, Droplet, LineChart } from "lucide-react";
+import { ChevronDown, Leaf, Pill, Droplet, LineChart, Loader } from "lucide-react";
 import { getWasteItems, getAvailableDrugs, type WasteItem, type DrugOption } from "./utils/wasteCalculator";
 
 export function App() {
   const [drugs, setDrugs] = useState<DrugOption[]>([]);
   const [selectedDrug, setSelectedDrug] = useState<string>("");
   const [selectedDose, setSelectedDose] = useState<string>("");
+  const [customDose, setCustomDose] = useState<string>("");
+  const [doseError, setDoseError] = useState<string>("");
   const [selectedForm, setSelectedForm] = useState<string>("");
   const [selectedMethod, setSelectedMethod] = useState<string>("");
   const [wasteItems, setWasteItems] = useState<WasteItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Load available drugs on mount
@@ -24,11 +26,18 @@ export function App() {
           setSelectedDrug(firstDrug.name);
           
           if (firstDrug.doses.length > 0) {
-            setSelectedDose(firstDrug.doses[0].dose);
+            const firstDose = firstDrug.doses[0];
+            if (firstDose.dose !== null) {
+              setSelectedDose(firstDose.dose);
+              setCustomDose("");
+            } else {
+              setSelectedDose("custom");
+              setCustomDose("");
+            }
             
-            if (firstDrug.doses[0].forms.length > 0) {
-              setSelectedForm(firstDrug.doses[0].forms[0].form);
-              setSelectedMethod(firstDrug.doses[0].forms[0].methods[0]);
+            if (firstDose.forms.length > 0) {
+              setSelectedForm(firstDose.forms[0].form);
+              setSelectedMethod(firstDose.forms[0].methods[0]);
             }
           }
         }
@@ -45,25 +54,29 @@ export function App() {
   // Calculate total waste
   const totalWaste = wasteItems.reduce((total, item) => total + item.totalWaste, 0);
 
-  // Load waste data when selections change
-  useEffect(() => {
-    async function loadWaste() {
-      if (!selectedDrug || !selectedDose || !selectedMethod) return;
+  // Function to handle calculation
+  const handleCalculate = async () => {
+    if (!selectedDrug || !selectedMethod) return;
+    if (selectedDose === "custom" && !customDose) return;
+    if (doseError) return;
+    
+    try {
+      setLoading(true);
+      setError(null);
+      setWasteItems([]); // Clear previous results while loading
       
-      try {
-        setLoading(true);
-        setError(null);
-        const items = await getWasteItems(selectedDrug, selectedDose, selectedMethod);
-        setWasteItems(items);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load waste data');
-      } finally {
-        setLoading(false);
-      }
+      // Add artificial delay
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      const dose = selectedDose === "custom" ? parseFloat(customDose) : selectedDose;
+      const items = await getWasteItems(selectedDrug, dose, selectedMethod);
+      setWasteItems(items);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load waste data');
+    } finally {
+      setLoading(false);
     }
-
-    loadWaste();
-  }, [selectedDrug, selectedDose, selectedMethod]);
+  };
 
   // Get current drug data
   const currentDrug = drugs.find(d => d.name === selectedDrug);
@@ -71,14 +84,80 @@ export function App() {
   // Get available doses for selected drug
   const availableDoses = currentDrug?.doses || [];
   
-  // Get available forms for selected dose
-  const availableForms = currentDrug?.doses
-    .find(d => d.dose === selectedDose)?.forms || [];
+  // Get current dose option
+  const currentDose = availableDoses.find(d => 
+    d.dose === (selectedDose === "custom" ? null : selectedDose)
+  );
   
-  // Get available methods for selected form
-  const availableMethods = currentDrug?.doses
-    .find(d => d.dose === selectedDose)?.forms
-    .find(f => f.form === selectedForm)?.methods || [];
+  // Get available forms and methods based on the current dose value
+  const { availableForms, availableMethods } = (() => {
+    if (selectedDose === "custom" && customDose) {
+      const numValue = parseFloat(customDose);
+      const matchingRange = currentDose?.doseRanges?.find(range => 
+        numValue >= range.minDose && 
+        numValue <= range.maxDose
+      );
+      
+      if (matchingRange) {
+        return {
+          availableForms: [{ form: matchingRange.form, methods: matchingRange.methods }],
+          availableMethods: matchingRange.form === selectedForm ? matchingRange.methods : []
+        };
+      }
+      return { availableForms: [], availableMethods: [] };
+    }
+    
+    const forms = currentDose?.forms || [];
+    return {
+      availableForms: forms,
+      availableMethods: forms.find(f => f.form === selectedForm)?.methods || []
+    };
+  })();
+
+  // Handle custom dose change
+  const handleCustomDoseChange = (value: string) => {
+    setCustomDose(value);
+    
+    if (!value) {
+      setDoseError("Dose is required");
+      return;
+    }
+    
+    const numValue = parseFloat(value);
+    if (isNaN(numValue)) {
+      setDoseError("Please enter a valid number");
+      return;
+    }
+    
+    // Find the appropriate range for this dose
+    const doseRanges = currentDose?.doseRanges || [];
+    const matchingRange = doseRanges.find(range => 
+      numValue >= range.minDose && numValue <= range.maxDose
+    );
+    
+    if (!matchingRange) {
+      // Show all available ranges
+      if (doseRanges.length > 0) {
+        const rangesText = doseRanges
+          .map(r => `${r.minDose}-${r.maxDose}`)
+          .join(', ');
+        setDoseError(`Dose must be in one of these ranges: ${rangesText} mg`);
+      } else {
+        setDoseError("Invalid dose");
+      }
+      return;
+    }
+    
+    // Update form and method based on the matching range
+    setSelectedForm(matchingRange.form);
+    setSelectedMethod(matchingRange.methods[0]);
+    setDoseError("");
+  };
+
+  // Get placeholder text for custom dose input
+  const getDosePlaceholder = () => {
+    return "Enter dose";
+  };
 
   return (
     <div className="bg-gradient-to-b from-slate-800 to-slate-900 min-h-screen text-white">
@@ -90,7 +169,7 @@ export function App() {
               Antibiotic Waste Calculator
             </h1>
           </div>
-          <p className="text-slate-300 text-lg max-w-2xl">
+          <p className="text-slate-300 text-lg max-w-4xl">
             A tool to help doctors calculate the amount of plastic waste created
             by an antibiotic regimen.
           </p>
@@ -111,13 +190,22 @@ export function App() {
                       const newDrug = drugs.find(d => d.name === e.target.value);
                       setSelectedDrug(e.target.value);
                       if (newDrug && newDrug.doses.length > 0) {
-                        setSelectedDose(newDrug.doses[0].dose);
-                        if (newDrug.doses[0].forms.length > 0) {
-                          setSelectedForm(newDrug.doses[0].forms[0].form);
-                          setSelectedMethod(newDrug.doses[0].forms[0].methods[0]);
+                        const firstDose = newDrug.doses[0];
+                        if (firstDose.dose !== null) {
+                          setSelectedDose(firstDose.dose);
+                          setCustomDose("");
+                        } else {
+                          setSelectedDose("custom");
+                          setCustomDose("");
+                        }
+                        
+                        if (firstDose.forms.length > 0) {
+                          setSelectedForm(firstDose.forms[0].form);
+                          setSelectedMethod(firstDose.forms[0].methods[0]);
                         }
                       } else {
                         setSelectedDose("");
+                        setCustomDose("");
                         setSelectedForm("");
                         setSelectedMethod("");
                       }
@@ -137,31 +225,48 @@ export function App() {
                 <label className="block text-sm font-medium text-slate-300 mb-1">
                   Dose
                 </label>
-                <div className="relative">
-                  <select
-                    value={selectedDose}
-                    onChange={(e) => {
-                      setSelectedDose(e.target.value);
-                      const newForms = currentDrug?.doses
-                        .find(d => d.dose === e.target.value)?.forms || [];
-                      if (newForms.length > 0) {
-                        setSelectedForm(newForms[0].form);
-                        setSelectedMethod(newForms[0].methods[0]);
-                      } else {
-                        setSelectedForm("");
-                        setSelectedMethod("");
-                      }
-                    }}
-                    disabled={!availableDoses.length}
-                    className="appearance-none bg-slate-800 border border-slate-600 text-white py-3 px-4 pr-8 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {availableDoses.map(d => (
-                      <option key={d.dose} value={d.dose}>{d.dose} mg</option>
-                    ))}
-                  </select>
-                  <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                    <ChevronDown size={18} className="text-slate-400" />
-                  </div>
+                <div className="relative space-y-2">
+                  {availableDoses.some(d => d.dose === null) ? (
+                    <>
+                      <input
+                        type="number"
+                        value={customDose}
+                        onChange={(e) => handleCustomDoseChange(e.target.value)}
+                        placeholder={getDosePlaceholder()}
+                        className="appearance-none bg-slate-800 border border-slate-600 text-white py-3 px-4 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      />
+                      {doseError && (
+                        <p className="text-red-400 text-sm">{doseError}</p>
+                      )}
+                    </>
+                  ) : (
+                    <div className="relative">
+                      <select
+                        value={selectedDose}
+                        onChange={(e) => {
+                          setSelectedDose(e.target.value);
+                          setCustomDose("");
+                          const newDose = availableDoses.find(d => d.dose === e.target.value);
+                          if (newDose && newDose.forms.length > 0) {
+                            setSelectedForm(newDose.forms[0].form);
+                            setSelectedMethod(newDose.forms[0].methods[0]);
+                          } else {
+                            setSelectedForm("");
+                            setSelectedMethod("");
+                          }
+                        }}
+                        disabled={!availableDoses.length}
+                        className="appearance-none bg-slate-800 border border-slate-600 text-white py-3 px-4 pr-8 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {availableDoses.map(d => (
+                          <option key={d.dose ?? 'custom'} value={d.dose ?? 'custom'}>{d.dose ? `${d.dose} mg` : 'Custom dose'}</option>
+                        ))}
+                      </select>
+                      <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                        <ChevronDown size={18} className="text-slate-400" />
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
               <div className="relative">
@@ -213,6 +318,25 @@ export function App() {
                   </div>
                 </div>
               </div>
+            </div>
+            <div className="mt-4">
+              <button
+                onClick={handleCalculate}
+                disabled={!selectedDrug || !selectedMethod || (selectedDose === "custom" && !customDose) || !!doseError || loading}
+                className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold py-3 px-6 rounded-md shadow-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+              >
+                {loading ? (
+                  <>
+                    <Loader size={20} className="animate-spin" />
+                    <span>Calculating...</span>
+                  </>
+                ) : (
+                  <>
+                    <LineChart size={20} />
+                    <span>Calculate Waste</span>
+                  </>
+                )}
+              </button>
             </div>
             <div className="mt-8">
               <div className="flex items-center space-x-2 mb-4">
