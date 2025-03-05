@@ -5,5 +5,6 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 8000
-  }
+  },
+  base: '/antibiotic-calculator-v2/'
 }) 
