@@ -8,11 +8,46 @@ export function App() {
   const [selectedDose, setSelectedDose] = useState<string>("");
   const [customDose, setCustomDose] = useState<string>("");
   const [doseError, setDoseError] = useState<string>("");
+  const [duration, setDuration] = useState<string>("");
+  const [durationError, setDurationError] = useState<string>("");
+  const [frequency, setFrequency] = useState<string>("q24h");
   const [selectedForm, setSelectedForm] = useState<string>("");
   const [selectedMethod, setSelectedMethod] = useState<string>("");
   const [wasteItems, setWasteItems] = useState<WasteItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Frequency options with their hour values
+  const frequencyOptions = [
+    { label: "Every 48 hours (q48h)", value: "q48h", hours: 48 },
+    { label: "Every 24 hours (q24h)", value: "q24h", hours: 24 },
+    { label: "Every 12 hours (q12h)", value: "q12h", hours: 12 },
+    { label: "Every 8 hours (q8h)", value: "q8h", hours: 8 },
+    { label: "Every 6 hours (q6h)", value: "q6h", hours: 6 },
+    { label: "Every 4 hours (q4h)", value: "q4h", hours: 4 },
+  ];
+
+  // Calculate doses per day based on frequency
+  const getDosesForDuration = (durationDays: number, frequencyHours: number) => {
+    const totalHours = durationDays * 24;
+    return Math.ceil(totalHours / frequencyHours);
+  };
+
+  // Calculate IV tubing changes for the duration
+  const getIVTubingChanges = (durationDays: number) => {
+    return Math.ceil(durationDays / 4); // IV tubing is changed every 4 days
+  };
+
+  // Calculate total waste with special handling for IV tubing
+  const calculateTotalWasteForItem = (item: WasteItem, totalDoses: number, durationDays: number) => {
+    // Special case for IV tubing
+    if (item.item.toLowerCase().includes('iv tubing')) {
+      const tubingChanges = getIVTubingChanges(durationDays);
+      return item.quantity * item.weight * tubingChanges;
+    }
+    // Normal case for all other items
+    return item.quantity * item.weight * totalDoses;
+  };
 
   // Load available drugs on mount
   useEffect(() => {
@@ -51,13 +86,43 @@ export function App() {
     loadDrugs();
   }, []);
 
-  // Calculate total waste
-  const totalWaste = wasteItems.reduce((total, item) => total + item.totalWaste, 0);
+  // Handle duration change
+  const handleDurationChange = (value: string) => {
+    setDuration(value);
+    
+    if (!value) {
+      setDurationError("Duration is required");
+      return;
+    }
+    
+    const numValue = parseFloat(value);
+    if (isNaN(numValue) || numValue <= 0 || !Number.isInteger(numValue)) {
+      setDurationError("Please enter a valid whole number greater than 0");
+      return;
+    }
+    
+    setDurationError("");
+  };
+
+  // Calculate waste totals
+  const perDoseWaste = wasteItems.reduce((total, item) => {
+    // For per-dose waste, we don't apply the special IV tubing rule
+    return total + item.totalWaste;
+  }, 0);
+
+  const selectedFrequency = frequencyOptions.find(f => f.value === frequency)!;
+  const totalDoses = getDosesForDuration(parseInt(duration) || 0, selectedFrequency.hours);
+  const durationDays = parseInt(duration) || 0;
+
+  const totalWaste = wasteItems.reduce((total, item) => {
+    return total + calculateTotalWasteForItem(item, totalDoses, durationDays);
+  }, 0);
 
   // Function to handle calculation
   const handleCalculate = async () => {
     if (!selectedDrug || !selectedMethod) return;
     if (selectedDose === "custom" && !customDose) return;
+    if (!duration || durationError) return;
     if (doseError) return;
     
     try {
@@ -318,11 +383,51 @@ export function App() {
                   </div>
                 </div>
               </div>
+              <div className="relative">
+                <label className="block text-sm font-medium text-slate-300 mb-1">
+                  Frequency
+                </label>
+                <div className="relative">
+                  <select
+                    value={frequency}
+                    onChange={(e) => setFrequency(e.target.value)}
+                    className="appearance-none bg-slate-800 border border-slate-600 text-white py-3 px-4 pr-8 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    {frequencyOptions.map(option => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                    <ChevronDown size={18} className="text-slate-400" />
+                  </div>
+                </div>
+              </div>
+              <div className="relative">
+                <label className="block text-sm font-medium text-slate-300 mb-1">
+                  Duration (days)
+                </label>
+                <div className="relative space-y-2">
+                  <input
+                    type="number"
+                    value={duration}
+                    onChange={(e) => handleDurationChange(e.target.value)}
+                    placeholder="Enter number of days"
+                    min="1"
+                    step="1"
+                    className="appearance-none bg-slate-800 border border-slate-600 text-white py-3 px-4 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                  {durationError && (
+                    <p className="text-red-400 text-sm">{durationError}</p>
+                  )}
+                </div>
+              </div>
             </div>
             <div className="mt-4">
               <button
                 onClick={handleCalculate}
-                disabled={!selectedDrug || !selectedMethod || (selectedDose === "custom" && !customDose) || !!doseError || loading}
+                disabled={!selectedDrug || !selectedMethod || (selectedDose === "custom" && !customDose) || !!doseError || !!durationError || loading}
                 className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold py-3 px-6 rounded-md shadow-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
               >
                 {loading ? (
@@ -350,13 +455,31 @@ export function App() {
               ) : (
                 <>
                   <div className="bg-slate-800/80 rounded-lg p-5 border border-slate-700 mb-6">
-                    <div className="flex items-center justify-between">
-                      <span className="text-slate-300">
-                        Total plastic waste per dose:
-                      </span>
-                      <span className="text-2xl font-bold text-white">
-                        {totalWaste.toFixed(1)} g
-                      </span>
+                    <div className="flex flex-col space-y-4">
+                      <div className="flex items-center justify-between">
+                        <span className="text-slate-300">
+                          Plastic waste per dose:
+                        </span>
+                        <span className="text-xl font-bold text-white">
+                          {perDoseWaste.toFixed(1)} g
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-slate-300">
+                          Total doses ({duration} days, {selectedFrequency.label}):
+                        </span>
+                        <span className="text-lg font-medium text-white">
+                          {totalDoses} doses
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-slate-300">
+                          Total plastic waste:
+                        </span>
+                        <span className="text-2xl font-bold text-white">
+                          {totalWaste.toFixed(1)} g
+                        </span>
+                      </div>
                     </div>
                     <div className="mt-2 w-full bg-slate-700 rounded-full h-2.5">
                       <div
@@ -369,24 +492,38 @@ export function App() {
                   </div>
                   <div className="bg-slate-800/80 rounded-lg border border-slate-700">
                     <ul className="divide-y divide-slate-700">
-                      {wasteItems.map((item, index) => (
-                        <li
-                          key={index}
-                          className="px-5 py-3 flex justify-between items-center"
-                        >
-                          <div className="flex items-center">
-                            {index % 2 === 0 ? (
-                              <Pill className="text-blue-400 mr-3" size={16} />
-                            ) : (
-                              <Droplet className="text-green-400 mr-3" size={16} />
-                            )}
-                            <span className="text-slate-300">{item.item}:</span>
-                          </div>
-                          <span className="font-medium">
-                            {item.quantity} × {item.weight.toFixed(1)} g = {item.totalWaste.toFixed(1)} g
-                          </span>
-                        </li>
-                      ))}
+                      {wasteItems.map((item, index) => {
+                        const isIVTubing = item.item.toLowerCase().includes('iv tubing');
+                        const itemTotalWaste = calculateTotalWasteForItem(item, totalDoses, durationDays);
+                        
+                        return (
+                          <li
+                            key={index}
+                            className="px-5 py-3 flex justify-between items-center"
+                          >
+                            <div className="flex items-center">
+                              {index % 2 === 0 ? (
+                                <Pill className="text-blue-400 mr-3" size={16} />
+                              ) : (
+                                <Droplet className="text-green-400 mr-3" size={16} />
+                              )}
+                              <span className="text-slate-300">{item.item}:</span>
+                            </div>
+                            <div className="text-right">
+                              <span className="font-medium">
+                                {item.quantity} × {item.weight.toFixed(1)} g = {item.totalWaste.toFixed(1)} g per {isIVTubing ? '4 days' : 'dose'}
+                              </span>
+                              <br />
+                              <span className="text-slate-400 text-sm">
+                                {isIVTubing ? 
+                                  `Changed every 4 days (${getIVTubingChanges(durationDays)} changes) - ` : 
+                                  `${totalDoses} doses - `}
+                                Total: {itemTotalWaste.toFixed(1)} g
+                              </span>
+                            </div>
+                          </li>
+                        );
+                      })}
                     </ul>
                   </div>
                 </>
