@@ -42,7 +42,7 @@ async function loadWeights(): Promise<WeightData> {
     for (let i = 1; i < rows.length; i++) {
       const [item, weight] = rows[i];
       if (item && weight) {
-        weights[item] = Number(weight);
+        weights[item.toLowerCase()] = Number(weight);
       }
     }
     
@@ -277,7 +277,7 @@ export async function getWasteItems(drug: string, dose: string | number, method:
     for (let i = 7; i < headers.length; i++) {
       const itemName = headers[i];
       const quantity = Number(selectedRow[i]) || 0;
-      const weight = weights[itemName] || 0;
+      const weight = weights[itemName.toLowerCase()] || 0;
       
       // Include items that either have a quantity or a defined weight
       if (quantity > 0 || weight > 0) {
