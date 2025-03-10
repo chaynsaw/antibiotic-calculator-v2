@@ -120,10 +120,55 @@ export function App() {
 
   // Function to handle calculation
   const handleCalculate = async () => {
-    if (!selectedDrug || !selectedMethod) return;
-    if (selectedDose === "custom" && !customDose) return;
-    if (!duration || durationError) return;
-    if (doseError) return;
+    // Show validation messages if fields are invalid
+    let isValid = true;
+
+    // Check dose validity
+    if (selectedDose === "custom") {
+      if (!customDose) {
+        setDoseError("Dose is required");
+        isValid = false;
+      } else {
+        const numValue = parseFloat(customDose);
+        if (isNaN(numValue)) {
+          setDoseError("Please enter a valid number");
+          isValid = false;
+        } else {
+          // Find the appropriate range for this dose
+          const doseRanges = currentDose?.doseRanges || [];
+          const matchingRange = doseRanges.find(range => 
+            numValue >= range.minDose && numValue <= range.maxDose
+          );
+          
+          if (!matchingRange) {
+            if (doseRanges.length > 0) {
+              const rangesText = doseRanges
+                .map(r => `${r.minDose}-${r.maxDose}`)
+                .join(', ');
+              setDoseError(`Dose must be in one of these ranges: ${rangesText} mg`);
+              isValid = false;
+            } else {
+              setDoseError("Invalid dose");
+              isValid = false;
+            }
+          }
+        }
+      }
+    }
+
+    // Check duration validity
+    if (!duration) {
+      setDurationError("Duration is required");
+      isValid = false;
+    }
+
+    if (!isValid) {
+      return;
+    }
+
+    // Clear any existing errors if validation passes
+    setDoseError("");
+    setDurationError("");
     
     try {
       setLoading(true);
@@ -221,7 +266,7 @@ export function App() {
 
   // Get placeholder text for custom dose input
   const getDosePlaceholder = () => {
-    return "Enter dose";
+    return "Enter dose (mg)";
   };
 
   return (
@@ -427,7 +472,7 @@ export function App() {
             <div className="mt-4">
               <button
                 onClick={handleCalculate}
-                disabled={!selectedDrug || !selectedMethod || (selectedDose === "custom" && !customDose) || !!doseError || !!durationError || loading}
+                disabled={loading}
                 className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold py-3 px-6 rounded-md shadow-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
               >
                 {loading ? (
