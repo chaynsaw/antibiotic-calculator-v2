@@ -451,7 +451,7 @@ export function App() {
               </div>
               <div className="relative">
                 <label className="block text-sm font-medium text-slate-300 mb-1">
-                  Duration (days)
+                  Duration (Days)
                 </label>
                 <div className="relative space-y-2">
                   <input
