@@ -381,28 +381,52 @@ export function App() {
       return total + calculateTotalWasteForItem(item, doses, days);
     }, 0);
 
+    // Check if this is the most eco-friendly regimen
+    const isLowestWaste = regimens.length >= 2 && regimens.every(r => {
+      if (r.id === regimen.id) return true;
+      const rFreq = frequencyOptions.find(f => f.value === r.frequency)!;
+      const rDoses = getDosesForDuration(parseInt(r.duration), rFreq.hours);
+      const rDays = parseInt(r.duration);
+      const rTotalWaste = r.wasteItems.reduce((total, item) => 
+        total + calculateTotalWasteForItem(item, rDoses, rDays), 0
+      );
+      return totalWaste <= rTotalWaste;
+    });
+
     return (
-      <div className="mb-6">
+      <div className="mb-4">
         <button
           onClick={() => toggleRegimenCollapse(regimen.id)}
-          className="w-full bg-slate-800/90 p-4 rounded-t-xl border border-slate-700/50 flex flex-col hover:bg-slate-700/50 transition-colors duration-150"
+          className={`w-full p-3 md:p-4 rounded-t-xl border flex flex-col transition-colors duration-150 ${
+            isLowestWaste 
+              ? "bg-green-900/40 border-green-700/50 hover:bg-green-800/40" 
+              : "bg-slate-800/90 border-slate-700/50 hover:bg-slate-700/50"
+          }`}
         >
-          <div className="flex items-center justify-between w-full">
-            <div className="flex flex-col items-start">
-              <h3 className="text-lg font-semibold text-white">
-                {regimen.drug} • {regimen.form} • {regimen.dose}mg
-              </h3>
-              <p className="text-slate-300">
+          <div className="flex flex-col md:flex-row md:items-center justify-between w-full">
+            <div className="flex flex-col items-start mb-2 md:mb-0">
+              <div className="flex flex-wrap items-center gap-2">
+                <h3 className="text-base md:text-lg font-semibold text-white">
+                  {regimen.drug} • {regimen.form} • {regimen.dose}mg
+                </h3>
+                {isLowestWaste && (
+                  <div className="flex items-center space-x-1 text-green-400">
+                    <Leaf size={14} className="shrink-0" />
+                    <span className="text-xs md:text-sm font-medium">Most eco-friendly</span>
+                  </div>
+                )}
+              </div>
+              <p className="text-sm md:text-base text-slate-300 mt-1">
                 {freq.label} for {regimen.duration} days
               </p>
             </div>
-            <div className="flex items-center space-x-4">
-              <p className="text-xl font-bold text-white">
+            <div className="flex items-center justify-between md:justify-end w-full md:w-auto">
+              <p className="text-lg md:text-xl font-bold text-white">
                 {totalWaste.toFixed(1)}g waste
               </p>
               <ChevronDown
-                size={20}
-                className={`text-slate-400 transition-transform duration-200 ${
+                size={18}
+                className={`text-slate-400 transition-transform duration-200 ml-3 ${
                   !isCollapsed ? "transform rotate-180" : ""
                 }`}
               />
@@ -411,44 +435,44 @@ export function App() {
         </button>
         {!isCollapsed && (
           <div className="bg-slate-800/80 rounded-b-xl border-x border-b border-slate-700/50">
-            <div className="p-5">
-              <div className="flex flex-col space-y-4">
+            <div className="p-3 md:p-5">
+              <div className="flex flex-col space-y-3 md:space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-300">
+                  <span className="text-sm md:text-base text-slate-300">
                     Plastic waste per dose:
                   </span>
-                  <span className="text-xl font-bold text-white">
+                  <span className="text-lg md:text-xl font-bold text-white">
                     {perDoseWaste.toFixed(1)} g
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-300">
-                    Total doses ({regimen.duration} days, {freq.label}):
+                  <span className="text-sm md:text-base text-slate-300">
+                    Total doses ({regimen.duration} days):
                   </span>
-                  <span className="text-lg font-medium text-white">
+                  <span className="text-base md:text-lg font-medium text-white">
                     {doses} doses
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-300">
+                  <span className="text-sm md:text-base text-slate-300">
                     Total plastic waste:
                   </span>
-                  <span className="text-2xl font-bold text-white">
+                  <span className="text-xl md:text-2xl font-bold text-white">
                     {totalWaste.toFixed(1)} g
                   </span>
                 </div>
               </div>
-              <div className="mt-2 w-full bg-slate-700 rounded-full h-2.5">
+              <div className="mt-2 w-full bg-slate-700 rounded-full h-2">
                 <div
-                  className="bg-gradient-to-r from-green-500 to-blue-500 h-2.5 rounded-full"
+                  className="bg-gradient-to-r from-green-500 to-blue-500 h-2 rounded-full"
                   style={{
                     width: `${Math.min((totalWaste / 500) * 100, 100)}%`,
                   }}
                 ></div>
               </div>
-              <div className="mt-6">
+              <div className="mt-4 md:mt-6">
                 <div className="border-t border-slate-700">
-                  <h3 className="text-lg font-semibold text-white pt-4 pb-2">Detailed Breakdown</h3>
+                  <h3 className="text-base md:text-lg font-semibold text-white pt-3 md:pt-4 pb-2">Detailed Breakdown</h3>
                   <ul className="divide-y divide-slate-700">
                     {regimen.wasteItems.map((item, index) => {
                       const isIVTubing = item.item.toLowerCase().includes('iv tubing');
@@ -457,21 +481,21 @@ export function App() {
                       return (
                         <li
                           key={index}
-                          className="py-4 flex justify-between items-start"
+                          className="py-3 md:py-4 flex flex-col md:flex-row md:justify-between md:items-start gap-2 md:gap-4"
                         >
-                          <div className="flex items-center space-x-3">
+                          <div className="flex items-center space-x-2">
                             {index % 2 === 0 ? (
-                              <Pill className="text-blue-400 shrink-0" size={18} />
+                              <Pill className="text-blue-400 shrink-0" size={16} />
                             ) : (
-                              <Droplet className="text-green-400 shrink-0" size={18} />
+                              <Droplet className="text-green-400 shrink-0" size={16} />
                             )}
-                            <span className="text-white font-medium">{item.item}</span>
+                            <span className="text-sm md:text-base text-white font-medium">{item.item}</span>
                           </div>
                           <div className="text-right">
-                            <div className="text-white font-medium">
+                            <div className="text-sm md:text-base text-white font-medium">
                               {item.quantity} × {item.weight.toFixed(1)} g = {item.totalWaste.toFixed(1)} g per {isIVTubing ? '4 days' : 'dose'}
                             </div>
-                            <div className="text-slate-400 text-sm mt-1">
+                            <div className="text-xs md:text-sm text-slate-400 mt-1">
                               {isIVTubing ? 
                                 `Changed every 4 days (${getIVTubingChanges(days)} changes) - ` : 
                                 `${doses} doses - `}
@@ -763,7 +787,7 @@ export function App() {
                       onClick={saveCurrentRegimen}
                       className="bg-[#4477FF] hover:bg-blue-600 text-white font-semibold py-4 px-6 rounded-xl shadow-lg transition-colors duration-200 text-lg"
                     >
-                      Save and compare another regimen
+                      Save regimen
                     </button>
                   </div>
                 </>
