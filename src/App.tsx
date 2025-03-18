@@ -793,7 +793,8 @@ export function App() {
           {/* Show saved regimens in a separate card below the form */}
           {regimens.length > 0 && (
             <div className="mt-8 bg-slate-700/50 backdrop-blur-sm rounded-lg p-6 shadow-xl border border-slate-600">
-              <h3 className="text-xl font-semibold mb-6">Saved Regimens</h3>
+              <h3 className="text-xl font-semibold mb-2">Saved Regimens</h3>
+              <p className="text-slate-300 text-sm mb-6">To compare, Calculate Waste above and then Save Regimen.</p>
               {regimens.map(regimen => (
                 <RegimenResult key={regimen.id} regimen={regimen} />
               ))}
