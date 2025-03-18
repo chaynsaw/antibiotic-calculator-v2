@@ -381,7 +381,7 @@ export function App() {
               </div>
               <div className="relative">
                 <label className="block text-sm font-medium text-slate-300 mb-1">
-                  Form
+                  Administration Method
                 </label>
                 <div className="relative">
                   <select
@@ -410,7 +410,7 @@ export function App() {
               </div>
               <div className="relative">
                 <label className="block text-sm font-medium text-slate-300 mb-1">
-                  Administration Method
+                  Form
                 </label>
                 <div className="relative">
                   <select
