@@ -3,6 +3,13 @@ import { ChevronDown, Leaf, Pill, Droplet, LineChart, Loader } from "lucide-reac
 import { getWasteItems, getAvailableDrugs, type WasteItem, type DrugOption } from "./utils/wasteCalculator";
 
 export function App() {
+  // Add title effect
+  useEffect(() => {
+    if (window.location.hostname === 'localhost') {
+      document.title = '(LOCAL) Antibiotic Waste Calculator';
+    }
+  }, []);
+
   const [drugs, setDrugs] = useState<DrugOption[]>([]);
   const [selectedDrug, setSelectedDrug] = useState<string>("");
   const [selectedDose, setSelectedDose] = useState<string>("");
