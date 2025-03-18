@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ChevronDown, Leaf, Pill, Droplet, LineChart, Loader, Plus } from "lucide-react";
+import { ChevronDown, Leaf, Pill, Droplet, LineChart, Loader } from "lucide-react";
 import { getWasteItems, getAvailableDrugs, type WasteItem, type DrugOption } from "./utils/wasteCalculator";
 
 // Define types for regimen management
@@ -37,7 +37,6 @@ export function App() {
   const [wasteItems, setWasteItems] = useState<WasteItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [showDetails, setShowDetails] = useState(false);
 
   // Track regimens
   const [regimens, setRegimens] = useState<Regimen[]>([]);
@@ -297,13 +296,6 @@ export function App() {
     return "Enter dose (mg)";
   };
 
-  // Function to format regimen title
-  const getRegimenTitle = () => {
-    if (!selectedDrug || !selectedDose || !selectedMethod || !duration || !frequency) return "";
-    const freq = frequencyOptions.find(f => f.value === frequency)?.value || frequency;
-    return `${selectedDrug} ${selectedDose}mg ${selectedForm} (${selectedMethod}) ${freq} for ${duration} days: ${totalWaste.toFixed(1)}g`;
-  };
-
   // Function to toggle collapse state for a regimen
   const toggleRegimenCollapse = (id: number) => {
     setCollapsedRegimens(prev => ({
@@ -367,7 +359,6 @@ export function App() {
     setFrequency("q24h");
     setDuration("");
     setWasteItems([]);
-    setShowDetails(false);
   };
 
   // Regimen Result Component
