@@ -1,6 +1,20 @@
 import { useState, useEffect } from "react";
-import { ChevronDown, Leaf, Pill, Droplet, LineChart, Loader } from "lucide-react";
+import { ChevronDown, Leaf, Pill, Droplet, LineChart, Loader, Plus } from "lucide-react";
 import { getWasteItems, getAvailableDrugs, type WasteItem, type DrugOption } from "./utils/wasteCalculator";
+
+// Define types for regimen management
+interface Regimen {
+  id: number;
+  drug: string;
+  dose: string;
+  customDose: string;
+  form: string;
+  method: string;
+  frequency: string;
+  duration: string;
+  wasteItems: WasteItem[];
+  showDetails: boolean;
+}
 
 export function App() {
   // Add title effect
@@ -23,6 +37,13 @@ export function App() {
   const [wasteItems, setWasteItems] = useState<WasteItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showDetails, setShowDetails] = useState(false);
+
+  // Track regimens
+  const [regimens, setRegimens] = useState<Regimen[]>([]);
+
+  // Collapsible state for each regimen
+  const [collapsedRegimens, setCollapsedRegimens] = useState<{[key: number]: boolean}>({});
 
   // Frequency options with their hour values
   const frequencyOptions = [
@@ -276,6 +297,200 @@ export function App() {
     return "Enter dose (mg)";
   };
 
+  // Function to format regimen title
+  const getRegimenTitle = () => {
+    if (!selectedDrug || !selectedDose || !selectedMethod || !duration || !frequency) return "";
+    const freq = frequencyOptions.find(f => f.value === frequency)?.value || frequency;
+    return `${selectedDrug} ${selectedDose}mg ${selectedForm} (${selectedMethod}) ${freq} for ${duration} days: ${totalWaste.toFixed(1)}g`;
+  };
+
+  // Function to toggle collapse state for a regimen
+  const toggleRegimenCollapse = (id: number) => {
+    setCollapsedRegimens(prev => ({
+      ...prev,
+      [id]: !prev[id]
+    }));
+  };
+
+  // Function to save current regimen
+  const saveCurrentRegimen = () => {
+    if (!wasteItems.length) return;
+
+    const newRegimen: Regimen = {
+      id: Date.now(),
+      drug: selectedDrug,
+      dose: selectedDose === "custom" ? customDose : selectedDose,
+      customDose,
+      form: selectedForm,
+      method: selectedMethod,
+      frequency,
+      duration,
+      wasteItems,
+      showDetails: false,
+    };
+
+    setRegimens(prev => [...prev, newRegimen]);
+    setCollapsedRegimens(prev => ({
+      ...prev,
+      [newRegimen.id]: true // Start collapsed
+    }));
+
+    // Reset form
+    resetForm();
+  };
+
+  // Function to reset form
+  const resetForm = () => {
+    const firstDrug = drugs[0];
+    if (firstDrug) {
+      setSelectedDrug(firstDrug.name);
+      
+      const firstDose = firstDrug.doses[0];
+      if (firstDose) {
+        if (firstDose.dose !== null) {
+          setSelectedDose(firstDose.dose);
+          setCustomDose("");
+        } else {
+          setSelectedDose("custom");
+          setCustomDose("");
+        }
+        
+        if (firstDose.forms.length > 0) {
+          setSelectedForm(firstDose.forms[0].form);
+          if (firstDose.forms[0].methods.length > 0) {
+            setSelectedMethod(firstDose.forms[0].methods[0]);
+          }
+        }
+      }
+    }
+    
+    setFrequency("q24h");
+    setDuration("");
+    setWasteItems([]);
+    setShowDetails(false);
+  };
+
+  // Regimen Result Component
+  const RegimenResult = ({ regimen }: { regimen: Regimen }) => {
+    const isCollapsed = collapsedRegimens[regimen.id];
+    const freq = frequencyOptions.find(f => f.value === regimen.frequency)!;
+    const doses = getDosesForDuration(parseInt(regimen.duration), freq.hours);
+    const days = parseInt(regimen.duration);
+    const perDoseWaste = regimen.wasteItems.reduce((total, item) => total + item.totalWaste, 0);
+    const totalWaste = regimen.wasteItems.reduce((total, item) => {
+      return total + calculateTotalWasteForItem(item, doses, days);
+    }, 0);
+
+    return (
+      <div className="mb-6">
+        <button
+          onClick={() => toggleRegimenCollapse(regimen.id)}
+          className="w-full bg-slate-800/90 p-4 rounded-t-xl border border-slate-700/50 flex flex-col hover:bg-slate-700/50 transition-colors duration-150"
+        >
+          <div className="flex items-center justify-between w-full">
+            <div className="flex flex-col items-start">
+              <h3 className="text-lg font-semibold text-white">
+                {regimen.drug} • {regimen.form} • {regimen.dose}mg
+              </h3>
+              <p className="text-slate-300">
+                {freq.label} for {regimen.duration} days
+              </p>
+            </div>
+            <div className="flex items-center space-x-4">
+              <p className="text-xl font-bold text-white">
+                {totalWaste.toFixed(1)}g waste
+              </p>
+              <ChevronDown
+                size={20}
+                className={`text-slate-400 transition-transform duration-200 ${
+                  !isCollapsed ? "transform rotate-180" : ""
+                }`}
+              />
+            </div>
+          </div>
+        </button>
+        {!isCollapsed && (
+          <div className="bg-slate-800/80 rounded-b-xl border-x border-b border-slate-700/50">
+            <div className="p-5">
+              <div className="flex flex-col space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-300">
+                    Plastic waste per dose:
+                  </span>
+                  <span className="text-xl font-bold text-white">
+                    {perDoseWaste.toFixed(1)} g
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-300">
+                    Total doses ({regimen.duration} days, {freq.label}):
+                  </span>
+                  <span className="text-lg font-medium text-white">
+                    {doses} doses
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-300">
+                    Total plastic waste:
+                  </span>
+                  <span className="text-2xl font-bold text-white">
+                    {totalWaste.toFixed(1)} g
+                  </span>
+                </div>
+              </div>
+              <div className="mt-2 w-full bg-slate-700 rounded-full h-2.5">
+                <div
+                  className="bg-gradient-to-r from-green-500 to-blue-500 h-2.5 rounded-full"
+                  style={{
+                    width: `${Math.min((totalWaste / 500) * 100, 100)}%`,
+                  }}
+                ></div>
+              </div>
+              <div className="mt-6">
+                <div className="border-t border-slate-700">
+                  <h3 className="text-lg font-semibold text-white pt-4 pb-2">Detailed Breakdown</h3>
+                  <ul className="divide-y divide-slate-700">
+                    {regimen.wasteItems.map((item, index) => {
+                      const isIVTubing = item.item.toLowerCase().includes('iv tubing');
+                      const itemTotalWaste = calculateTotalWasteForItem(item, doses, days);
+                      
+                      return (
+                        <li
+                          key={index}
+                          className="py-4 flex justify-between items-start"
+                        >
+                          <div className="flex items-center space-x-3">
+                            {index % 2 === 0 ? (
+                              <Pill className="text-blue-400 shrink-0" size={18} />
+                            ) : (
+                              <Droplet className="text-green-400 shrink-0" size={18} />
+                            )}
+                            <span className="text-white font-medium">{item.item}</span>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-white font-medium">
+                              {item.quantity} × {item.weight.toFixed(1)} g = {item.totalWaste.toFixed(1)} g per {isIVTubing ? '4 days' : 'dose'}
+                            </div>
+                            <div className="text-slate-400 text-sm mt-1">
+                              {isIVTubing ? 
+                                `Changed every 4 days (${getIVTubingChanges(days)} changes) - ` : 
+                                `${doses} doses - `}
+                              Total: {itemTotalWaste.toFixed(1)} g
+                            </div>
+                          </div>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className="bg-gradient-to-b from-slate-800 to-slate-900 min-h-screen text-white">
       <header className="pt-8 pb-4 px-6 md:px-12">
@@ -504,8 +719,9 @@ export function App() {
                 <div className="text-center py-8 text-slate-300">Loading waste data...</div>
               ) : error ? (
                 <div className="text-center py-8 text-red-400">{error}</div>
-              ) : (
+              ) : wasteItems.length > 0 ? (
                 <>
+                  {/* Show current calculation */}
                   <div className="bg-slate-800/80 rounded-lg p-5 border border-slate-700 mb-6">
                     <div className="flex flex-col space-y-4">
                       <div className="flex items-center justify-between">
@@ -542,46 +758,32 @@ export function App() {
                       ></div>
                     </div>
                   </div>
-                  <div className="bg-slate-800/80 rounded-lg border border-slate-700">
-                    <ul className="divide-y divide-slate-700">
-                      {wasteItems.map((item, index) => {
-                        const isIVTubing = item.item.toLowerCase().includes('iv tubing');
-                        const itemTotalWaste = calculateTotalWasteForItem(item, totalDoses, durationDays);
-                        
-                        return (
-                          <li
-                            key={index}
-                            className="px-5 py-3 flex justify-between items-center"
-                          >
-                            <div className="flex items-center">
-                              {index % 2 === 0 ? (
-                                <Pill className="text-blue-400 mr-3" size={16} />
-                              ) : (
-                                <Droplet className="text-green-400 mr-3" size={16} />
-                              )}
-                              <span className="text-slate-300">{item.item}:</span>
-                            </div>
-                            <div className="text-right">
-                              <span className="font-medium">
-                                {item.quantity} × {item.weight.toFixed(1)} g = {item.totalWaste.toFixed(1)} g per {isIVTubing ? '4 days' : 'dose'}
-                              </span>
-                              <br />
-                              <span className="text-slate-400 text-sm">
-                                {isIVTubing ? 
-                                  `Changed every 4 days (${getIVTubingChanges(durationDays)} changes) - ` : 
-                                  `${totalDoses} doses - `}
-                                Total: {itemTotalWaste.toFixed(1)} g
-                              </span>
-                            </div>
-                          </li>
-                        );
-                      })}
-                    </ul>
+                  <div className="grid grid-cols-1 gap-4 mb-6">
+                    <button
+                      onClick={saveCurrentRegimen}
+                      className="bg-[#4477FF] hover:bg-blue-600 text-white font-semibold py-4 px-6 rounded-xl shadow-lg transition-colors duration-200 text-lg"
+                    >
+                      Save and compare another regimen
+                    </button>
                   </div>
                 </>
+              ) : (
+                <div className="text-center py-8 text-slate-300">
+                  Enter antibiotic details and click Calculate Waste to see results
+                </div>
               )}
             </div>
           </div>
+
+          {/* Show saved regimens in a separate card below the form */}
+          {regimens.length > 0 && (
+            <div className="mt-8 bg-slate-700/50 backdrop-blur-sm rounded-lg p-6 shadow-xl border border-slate-600">
+              <h3 className="text-xl font-semibold mb-6">Saved Regimens</h3>
+              {regimens.map(regimen => (
+                <RegimenResult key={regimen.id} regimen={regimen} />
+              ))}
+            </div>
+          )}
         </div>
       </main>
       <footer className="py-4 px-6 text-center text-sm text-slate-400">
