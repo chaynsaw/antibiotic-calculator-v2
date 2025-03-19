@@ -50,7 +50,7 @@ Ceftazidime,2000,,,3,IV,Vial (Powder),0,0,2,2,1,1,1,1,0,1,0,0,0,0,0,0,0,1,1,0,0,
 Ceftazidime-avibactam,940,,,3,IV,Vial (Powder),0,0,2,2,1,1,1,1,0,1,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0
 Ceftazidime-avibactam,1250,,,3,IV,Vial (Powder),0,0,2,2,1,1,1,1,0,1,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0
 Ceftazidime-avibactam,2500,,,3,IV,Vial (Powder),0,0,2,2,1,1,1,1,0,1,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0
-Ceftolozane-tazobactam,1500,,,3,IV,Vial (Powder),0,0,2,2,1,1,1,1,0,0,1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0
+Ceftolozane-tazobactam,Ceftolozane-tazobactam,,,3,IV,Vial (Powder),0,0,2,2,1,1,1,1,0,0,1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0
 Ceftolozane-tazobactam,3000,,,3,IV,Vial (Powder),0,0,3,3,1,1,1,1,0,0,1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0
 Ceftriaxone,250,,,1,IM,Vial (Powder),0,0,2,2,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 Ceftriaxone,250,,,1,IM,Vial (Solution),0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
