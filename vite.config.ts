@@ -6,5 +6,5 @@ export default defineConfig({
   server: {
     port: 8000
   },
-  base: '/antibiotic-calculator-v2/'
+  base: '/'
 }) 
