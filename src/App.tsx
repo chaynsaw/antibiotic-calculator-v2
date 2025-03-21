@@ -444,13 +444,16 @@ export function App() {
                     {doses} doses
                   </span>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm md:text-base text-slate-300">
-                    Total plastic waste:
-                  </span>
-                  <span className="text-xl md:text-2xl font-bold text-white">
-                    {totalWaste.toFixed(1)} g
-                  </span>
+                <div className="flex flex-col space-y-1">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm md:text-base text-slate-300">
+                      Total plastic waste:
+                    </span>
+                    <span className="text-xl md:text-2xl font-bold text-white">
+                      {totalWaste.toFixed(1)} g
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-400 text-right">For reference: a standard plastic water bottle weighs ~10g</p>
                 </div>
               </div>
               <div className="mt-2 w-full bg-slate-700 rounded-full h-2">
@@ -517,8 +520,7 @@ export function App() {
             </h1>
           </div>
           <p className="text-slate-300 text-lg max-w-4xl">
-            A tool to help doctors calculate the amount of plastic waste created
-            by an antibiotic regimen.
+            A tool to help you calculate and compare waste from antibiotic regimens.
           </p>
         </div>
       </header>
@@ -755,13 +757,16 @@ export function App() {
                           {totalDoses} doses
                         </span>
                       </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-slate-300">
-                          Total plastic waste:
-                        </span>
-                        <span className="text-2xl font-bold text-white">
-                          {totalWaste.toFixed(1)} g
-                        </span>
+                      <div className="flex flex-col space-y-1">
+                        <div className="flex items-center justify-between">
+                          <span className="text-slate-300">
+                            Total plastic waste:
+                          </span>
+                          <span className="text-2xl font-bold text-white">
+                            {totalWaste.toFixed(1)} g
+                          </span>
+                        </div>
+                        <p className="text-xs text-slate-400 text-right">For reference: a standard plastic water bottle weighs ~10g</p>
                       </div>
                     </div>
                     <div className="mt-2 w-full bg-slate-700 rounded-full h-2.5">
@@ -784,7 +789,10 @@ export function App() {
                 </>
               ) : (
                 <div className="text-center py-8 text-slate-300">
-                  Enter antibiotic details and click Calculate Waste to see results
+                  {regimens.length > 0 
+                    ? <span dangerouslySetInnerHTML={{ __html: 'Enter details for another regimen above, then Calculate Waste and <span class="font-bold">Save Regimen</span> to compare' }} />
+                    : "Enter antibiotic details and click Calculate Waste to see results"
+                  }
                 </div>
               )}
             </div>
@@ -794,7 +802,6 @@ export function App() {
           {regimens.length > 0 && (
             <div className="mt-8 bg-slate-700/50 backdrop-blur-sm rounded-lg p-6 shadow-xl border border-slate-600">
               <h3 className="text-xl font-semibold mb-2">Saved Regimens</h3>
-              <p className="text-slate-300 text-sm mb-6">To compare, Calculate Waste above and then Save Regimen.</p>
               {regimens.map(regimen => (
                 <RegimenResult key={regimen.id} regimen={regimen} />
               ))}
