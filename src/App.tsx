@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { ChevronDown, Leaf, Pill, Droplet, LineChart, Loader } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { ChevronDown, Leaf, Pill, Droplet, LineChart, Loader, Search } from "lucide-react";
 import { getWasteItems, getAvailableDrugs, type WasteItem, type DrugOption } from "./utils/wasteCalculator";
 
 // Define types for regimen management
@@ -509,6 +509,26 @@ export function App() {
     );
   };
 
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Filter drugs based on search term
+  const filteredDrugs = drugs.filter(drug =>
+    drug.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  // Handle click outside to close dropdown
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   return (
     <div className="bg-gradient-to-b from-slate-800 to-slate-900 min-h-screen text-white">
       <header className="pt-8 pb-4 px-6 md:px-12">
@@ -532,41 +552,74 @@ export function App() {
                 <label className="block text-sm font-medium text-slate-300 mb-1">
                   Antibiotic
                 </label>
-                <div className="relative">
-                  <select
-                    value={selectedDrug}
-                    onChange={(e) => {
-                      const newDrug = drugs.find(d => d.name === e.target.value);
-                      setSelectedDrug(e.target.value);
-                      if (newDrug && newDrug.doses.length > 0) {
-                        const firstDose = newDrug.doses[0];
-                        if (firstDose.dose !== null) {
-                          setSelectedDose(firstDose.dose);
-                          setCustomDose("");
-                        } else {
-                          setSelectedDose("custom");
-                          setCustomDose("");
-                        }
-                        
-                        if (firstDose.forms.length > 0) {
-                          setSelectedForm(firstDose.forms[0].form);
-                          setSelectedMethod(firstDose.forms[0].methods[0]);
-                        }
-                      } else {
-                        setSelectedDose("");
-                        setCustomDose("");
-                        setSelectedForm("");
-                        setSelectedMethod("");
-                      }
-                    }}
-                    className="appearance-none bg-slate-800 border border-slate-600 text-white py-3 px-4 pr-8 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  >
-                    {drugs.map(drug => (
-                      <option key={drug.name} value={drug.name}>{drug.name}</option>
-                    ))}
-                  </select>
-                  <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                    <ChevronDown size={18} className="text-slate-400" />
+                <div className="relative space-y-2">
+                  <div className="relative" ref={dropdownRef}>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        id="drug"
+                        value={searchTerm}
+                        onChange={(e) => {
+                          setSearchTerm(e.target.value);
+                          setIsDropdownOpen(true);
+                        }}
+                        onFocus={() => setIsDropdownOpen(true)}
+                        className="appearance-none bg-slate-800 border border-slate-600 text-white py-3 px-4 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="Search or select antibiotic..."
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                        className="absolute inset-y-0 right-0 flex items-center px-2 focus:outline-none"
+                      >
+                        <ChevronDown className="h-4 w-4 text-gray-400" aria-hidden="true" />
+                      </button>
+                    </div>
+                    
+                    {isDropdownOpen && (
+                      <div className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-sm shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                        {filteredDrugs.length === 0 ? (
+                          <div className="relative cursor-default select-none py-2 px-3 text-gray-500">
+                            No antibiotics found
+                          </div>
+                        ) : (
+                          filteredDrugs.map((drug) => (
+                            <div
+                              key={drug.name}
+                              className={`relative cursor-pointer select-none py-2 pl-3 pr-9 ${
+                                drug.name === selectedDrug
+                                  ? "bg-blue-600 text-white"
+                                  : "text-gray-900 hover:bg-blue-50"
+                              }`}
+                              onClick={() => {
+                                setSelectedDrug(drug.name);
+                                setSearchTerm(drug.name);
+                                setIsDropdownOpen(false);
+                                
+                                // Set initial values for the selected drug
+                                if (drug.doses.length > 0) {
+                                  const firstDose = drug.doses[0];
+                                  if (firstDose.dose !== null) {
+                                    setSelectedDose(firstDose.dose);
+                                    setCustomDose("");
+                                  } else {
+                                    setSelectedDose("custom");
+                                    setCustomDose("");
+                                  }
+                                  
+                                  if (firstDose.forms.length > 0) {
+                                    setSelectedForm(firstDose.forms[0].form);
+                                    setSelectedMethod(firstDose.forms[0].methods[0]);
+                                  }
+                                }
+                              }}
+                            >
+                              {drug.name}
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
