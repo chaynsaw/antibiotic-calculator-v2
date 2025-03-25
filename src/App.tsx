@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { ChevronDown, Leaf, Pill, Droplet, LineChart, Loader, Search } from "lucide-react";
+import { ChevronDown, Leaf, Pill, Droplet, LineChart, Loader } from "lucide-react";
 import { getWasteItems, getAvailableDrugs, type WasteItem, type DrugOption } from "./utils/wasteCalculator";
 
 // Define types for regimen management
