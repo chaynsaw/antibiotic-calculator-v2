@@ -319,6 +319,22 @@ export function App() {
     }));
   };
 
+  // Function to reset form to default values
+  const resetForm = () => {
+    // Clear all fields
+    setSelectedDrug("");
+    setSearchTerm(""); // Clear the search input
+    setSelectedDose("");
+    setCustomDose("");
+    setSelectedForm("");
+    setSelectedMethod("");
+    setFrequency("q24h");
+    setDuration("");
+    setWasteItems([]);
+    setDoseError("");
+    setDurationError("");
+  };
+
   // Function to save current regimen
   const saveCurrentRegimen = () => {
     if (!wasteItems.length) return;
@@ -342,38 +358,8 @@ export function App() {
       [newRegimen.id]: true // Start collapsed
     }));
 
-    // Reset form
+    // Reset form after saving
     resetForm();
-  };
-
-  // Function to reset form
-  const resetForm = () => {
-    const firstDrug = drugs[0];
-    if (firstDrug) {
-      setSelectedDrug(firstDrug.name);
-      
-      const firstDose = firstDrug.doses[0];
-      if (firstDose) {
-        if (firstDose.dose !== null) {
-          setSelectedDose(firstDose.dose);
-          setCustomDose("");
-        } else {
-          setSelectedDose("custom");
-          setCustomDose("");
-        }
-        
-        if (firstDose.forms.length > 0) {
-          setSelectedForm(firstDose.forms[0].form);
-          if (firstDose.forms[0].methods.length > 0) {
-            setSelectedMethod(firstDose.forms[0].methods[0]);
-          }
-        }
-      }
-    }
-    
-    setFrequency("q24h");
-    setDuration("");
-    setWasteItems([]);
   };
 
   // Regimen Result Component
