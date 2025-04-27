@@ -399,7 +399,7 @@ export function App() {
             <div className="flex flex-col items-start mb-2 md:mb-0">
               <div className="flex flex-wrap items-center gap-2">
                 <h3 className="text-base md:text-lg font-semibold text-white">
-                  {regimen.drug} • {regimen.form} • {regimen.dose}mg
+                  {regimen.drug} • {regimen.form} • {regimen.dose}mg • {regimen.method}
                 </h3>
                 {isLowestWaste && (
                   <div className="flex items-center space-x-1 text-green-400">
