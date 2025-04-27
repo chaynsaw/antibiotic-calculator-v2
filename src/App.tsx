@@ -520,6 +520,7 @@ export function App() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const [highlightedIndex, setHighlightedIndex] = useState(0);
 
   // Filter drugs based on search term
   const filteredDrugs = drugs.filter(drug =>
@@ -570,15 +571,19 @@ export function App() {
                         onChange={(e) => {
                           setSearchTerm(e.target.value);
                           setIsDropdownOpen(true);
+                          setHighlightedIndex(0);
                         }}
-                        onFocus={() => setIsDropdownOpen(true)}
+                        onFocus={() => {
+                          setIsDropdownOpen(true);
+                          setHighlightedIndex(0);
+                        }}
                         onBlur={() => {
                           // On blur, auto-select the topmost filtered option if not already selected
-                          if (filteredDrugs.length > 0 && selectedDrug !== filteredDrugs[0].name) {
-                            setSelectedDrug(filteredDrugs[0].name);
-                            setSearchTerm(filteredDrugs[0].name);
+                          if (filteredDrugs.length > 0 && selectedDrug !== filteredDrugs[highlightedIndex]?.name) {
+                            const drug = filteredDrugs[highlightedIndex];
+                            setSelectedDrug(drug.name);
+                            setSearchTerm(drug.name);
                             // Set initial values for the selected drug
-                            const drug = filteredDrugs[0];
                             if (drug.doses.length > 0) {
                               const firstDose = drug.doses[0];
                               if (firstDose.dose !== null) {
@@ -596,13 +601,23 @@ export function App() {
                           }
                         }}
                         onKeyDown={(e) => {
-                          if (e.key === "Enter") {
-                            // On Enter, auto-select the topmost filtered option if not already selected
-                            if (filteredDrugs.length > 0 && selectedDrug !== filteredDrugs[0].name) {
-                              setSelectedDrug(filteredDrugs[0].name);
-                              setSearchTerm(filteredDrugs[0].name);
+                          if (e.key === "ArrowDown") {
+                            e.preventDefault();
+                            setHighlightedIndex((prev) =>
+                              Math.min(prev + 1, filteredDrugs.length - 1)
+                            );
+                          } else if (e.key === "ArrowUp") {
+                            e.preventDefault();
+                            setHighlightedIndex((prev) =>
+                              Math.max(prev - 1, 0)
+                            );
+                          } else if (e.key === "Enter") {
+                            if (filteredDrugs.length > 0) {
+                              const drug = filteredDrugs[highlightedIndex];
+                              setSelectedDrug(drug.name);
+                              setSearchTerm(drug.name);
+                              setIsDropdownOpen(false);
                               // Set initial values for the selected drug
-                              const drug = filteredDrugs[0];
                               if (drug.doses.length > 0) {
                                 const firstDose = drug.doses[0];
                                 if (firstDose.dose !== null) {
@@ -645,11 +660,9 @@ export function App() {
                             <div
                               key={drug.name}
                               className={`relative cursor-pointer select-none py-2 pl-3 pr-9 ${
-                                drug.name === selectedDrug
+                                idx === highlightedIndex
                                   ? "bg-blue-600 text-white"
-                                  : idx === 0
-                                    ? "bg-blue-600 text-white"
-                                    : "text-gray-900 hover:bg-blue-50"
+                                  : "text-gray-900 hover:bg-blue-50"
                               }`}
                               onClick={() => {
                                 setSelectedDrug(drug.name);
@@ -670,6 +683,7 @@ export function App() {
                                     setSelectedMethod(firstDose.forms[0].methods[0]);
                                   }
                                 }
+                                setHighlightedIndex(0);
                               }}
                             >
                               {drug.name}
