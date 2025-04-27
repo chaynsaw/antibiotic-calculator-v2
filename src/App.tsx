@@ -172,7 +172,8 @@ export function App() {
               const rangesText = doseRanges
                 .map(r => `${r.minDose}-${r.maxDose}`)
                 .join(', ');
-              setDoseError(`Dose must be in one of these ranges: ${rangesText} mg`);
+              const unit = (selectedDrug === "Penicillin G Potassium" || selectedDrug === "Penicillin G Sodium") ? 'MU' : 'mg';
+              setDoseError(`Dose must be in one of these ranges: ${rangesText} ${unit}`);
               isValid = false;
             } else {
               setDoseError("Invalid dose");
@@ -275,7 +276,8 @@ export function App() {
       const rangesText = currentDose?.doseRanges
         ?.map(r => `${r.minDose}-${r.maxDose}`)
         .join(', ') || '';
-      setDoseError(`Dose must be in one of these ranges: ${rangesText} mg`);
+      const unit = (selectedDrug === "Penicillin G Potassium" || selectedDrug === "Penicillin G Sodium") ? 'MU' : 'mg';
+      setDoseError(`Dose must be in one of these ranges: ${rangesText} ${unit}`);
       return;
     }
     
@@ -305,6 +307,9 @@ export function App() {
 
   // Get placeholder text for custom dose input
   const getDosePlaceholder = () => {
+    if (selectedDrug === "Penicillin G Potassium" || selectedDrug === "Penicillin G Sodium") {
+      return "Enter dose (MU)";
+    }
     const ranges = currentDose?.doseRanges
       ?.map(r => `${r.minDose}-${r.maxDose}`)
       .join(', ');
@@ -399,7 +404,9 @@ export function App() {
             <div className="flex flex-col items-start mb-2 md:mb-0">
               <div className="flex flex-wrap items-center gap-2">
                 <h3 className="text-base md:text-lg font-semibold text-white">
-                  {regimen.drug} • {regimen.form} • {regimen.dose}mg • {regimen.method}
+                  {regimen.drug} • {regimen.form} • {regimen.dose}{
+                    (regimen.drug === "Penicillin G Potassium" || regimen.drug === "Penicillin G Sodium") ? 'MU' : 'mg'
+                  } • {regimen.method}
                 </h3>
                 {isLowestWaste && (
                   <div className="flex items-center space-x-1 text-green-400">
@@ -454,7 +461,7 @@ export function App() {
                       {totalWaste.toFixed(1)} g
                     </span>
                   </div>
-                  <p className="text-xs text-slate-400 text-right">For reference: a standard plastic water bottle weighs ~10g</p>
+                  <p className="text-base text-slate-400 text-right">For reference: a standard plastic water bottle weighs ~10g</p>
                 </div>
               </div>
               <div className="mt-2 w-full bg-slate-700 rounded-full h-2">
@@ -823,7 +830,7 @@ export function App() {
                             {totalWaste.toFixed(1)} g
                           </span>
                         </div>
-                        <p className="text-xs text-slate-400 text-right">For reference: a standard plastic water bottle weighs ~10g</p>
+                        <p className="text-base text-slate-400 text-right">For reference: a standard plastic water bottle weighs ~10g</p>
                       </div>
                     </div>
                     <div className="mt-2 w-full bg-slate-700 rounded-full h-2.5">
