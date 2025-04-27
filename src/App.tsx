@@ -217,24 +217,24 @@ export function App() {
 
   // Get current drug data
   const currentDrug = drugs.find(d => d.name === selectedDrug);
-  
-  // Get available doses for selected drug
-  const availableDoses = currentDrug?.doses || [];
-  
+
+  // Separate fixed and variable doses
+  const fixedDoses = currentDrug?.doses.filter(d => d.dose !== null) || [];
+  const variableDoses = currentDrug?.doses.filter(d => d.dose === null) || [];
+
   // Get current dose option
-  const currentDose = availableDoses.find(d => 
-    d.dose === (selectedDose === "custom" ? null : selectedDose)
-  );
-  
+  const currentDose = selectedDose === "custom" 
+    ? variableDoses[0] 
+    : fixedDoses.find(d => d.dose === selectedDose) || null;
+
   // Get available forms and methods based on the current dose value
   const { availableForms, availableMethods } = (() => {
     if (selectedDose === "custom" && customDose) {
       const numValue = parseFloat(customDose);
-      const matchingRange = currentDose?.doseRanges?.find(range => 
-        numValue >= range.minDose && 
-        numValue <= range.maxDose
+      const matchingRange = currentDose?.doseRanges?.find(range =>
+        numValue >= range.minDose && numValue <= range.maxDose
       );
-      
+
       if (matchingRange) {
         return {
           availableForms: [{ form: matchingRange.form, methods: matchingRange.methods }],
@@ -243,7 +243,7 @@ export function App() {
       }
       return { availableForms: [], availableMethods: [] };
     }
-    
+
     const forms = currentDose?.forms || [];
     return {
       availableForms: forms,
@@ -254,6 +254,7 @@ export function App() {
   // Handle custom dose change
   const handleCustomDoseChange = (value: string) => {
     setCustomDose(value);
+    setDoseError("");
     
     if (!value) {
       setDoseError("Dose is required");
@@ -266,34 +267,48 @@ export function App() {
       return;
     }
     
-    // Find the appropriate range for this dose
-    const doseRanges = currentDose?.doseRanges || [];
-    const matchingRange = doseRanges.find(range => 
+    const matchingRange = currentDose?.doseRanges?.find(range =>
       numValue >= range.minDose && numValue <= range.maxDose
     );
     
     if (!matchingRange) {
-      // Show all available ranges
-      if (doseRanges.length > 0) {
-        const rangesText = doseRanges
-          .map(r => `${r.minDose}-${r.maxDose}`)
-          .join(', ');
-        setDoseError(`Dose must be in one of these ranges: ${rangesText} mg`);
-      } else {
-        setDoseError("Invalid dose");
-      }
+      const rangesText = currentDose?.doseRanges
+        ?.map(r => `${r.minDose}-${r.maxDose}`)
+        .join(', ') || '';
+      setDoseError(`Dose must be in one of these ranges: ${rangesText} mg`);
       return;
     }
     
-    // Update form and method based on the matching range
     setSelectedForm(matchingRange.form);
     setSelectedMethod(matchingRange.methods[0]);
+  };
+
+  // Handle dose selection change
+  const handleDoseChange = (value: string) => {
+    setSelectedDose(value);
+    setCustomDose("");
     setDoseError("");
+    
+    if (value === "custom") {
+      return;
+    }
+    
+    const newDose = fixedDoses.find(d => d.dose === value);
+    if (newDose?.forms.length) {
+      setSelectedForm(newDose.forms[0].form);
+      setSelectedMethod(newDose.forms[0].methods[0]);
+    } else {
+      setSelectedForm("");
+      setSelectedMethod("");
+    }
   };
 
   // Get placeholder text for custom dose input
   const getDosePlaceholder = () => {
-    return "Enter dose (mg)";
+    const ranges = currentDose?.doseRanges
+      ?.map(r => `${r.minDose}-${r.maxDose}`)
+      .join(', ');
+    return ranges ? `Enter dose (${ranges} mg)` : "Enter dose (mg)";
   };
 
   // Function to toggle collapse state for a regimen
@@ -628,40 +643,43 @@ export function App() {
                   Dose
                 </label>
                 <div className="relative space-y-2">
-                  {availableDoses.some(d => d.dose === null) ? (
-                    <>
-                      <input
-                        type="number"
-                        value={customDose}
-                        onChange={(e) => handleCustomDoseChange(e.target.value)}
-                        placeholder={getDosePlaceholder()}
-                        className="appearance-none bg-slate-800 border border-slate-600 text-white py-3 px-4 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      />
+                  {variableDoses.length > 0 ? (
+                    <div className="relative">
+                      <select
+                        value={selectedDose}
+                        onChange={(e) => handleDoseChange(e.target.value)}
+                        className="appearance-none bg-slate-800 border border-slate-600 text-white py-3 px-4 pr-8 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      >
+                        {fixedDoses.map(d => (
+                          <option key={d.dose!} value={d.dose!}>{d.dose} mg</option>
+                        ))}
+                        <option value="custom">Custom dose</option>
+                      </select>
+                      {selectedDose === "custom" && (
+                        <input
+                          type="number"
+                          value={customDose}
+                          onChange={(e) => handleCustomDoseChange(e.target.value)}
+                          placeholder={getDosePlaceholder()}
+                          className="appearance-none bg-slate-800 border border-slate-600 text-white py-3 px-4 rounded-md w-full mt-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        />
+                      )}
                       {doseError && (
                         <p className="text-red-400 text-sm">{doseError}</p>
                       )}
-                    </>
+                      <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                        <ChevronDown size={18} className="text-slate-400" />
+                      </div>
+                    </div>
                   ) : (
                     <div className="relative">
                       <select
                         value={selectedDose}
-                        onChange={(e) => {
-                          setSelectedDose(e.target.value);
-                          setCustomDose("");
-                          const newDose = availableDoses.find(d => d.dose === e.target.value);
-                          if (newDose && newDose.forms.length > 0) {
-                            setSelectedForm(newDose.forms[0].form);
-                            setSelectedMethod(newDose.forms[0].methods[0]);
-                          } else {
-                            setSelectedForm("");
-                            setSelectedMethod("");
-                          }
-                        }}
-                        disabled={!availableDoses.length}
-                        className="appearance-none bg-slate-800 border border-slate-600 text-white py-3 px-4 pr-8 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                        onChange={(e) => handleDoseChange(e.target.value)}
+                        className="appearance-none bg-slate-800 border border-slate-600 text-white py-3 px-4 pr-8 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       >
-                        {availableDoses.map(d => (
-                          <option key={d.dose ?? 'custom'} value={d.dose ?? 'custom'}>{d.dose ? `${d.dose} mg` : 'Custom dose'}</option>
+                        {fixedDoses.map(d => (
+                          <option key={d.dose!} value={d.dose!}>{d.dose} mg</option>
                         ))}
                       </select>
                       <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
