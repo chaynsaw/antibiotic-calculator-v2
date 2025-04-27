@@ -660,9 +660,11 @@ export function App() {
                       {doseError && (
                         <p className="text-red-400 text-sm">{doseError}</p>
                       )}
-                      <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                        <ChevronDown size={18} className="text-slate-400" />
-                      </div>
+                      {selectedDose !== "custom" && (
+                        <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                          <ChevronDown size={18} className="text-slate-400" />
+                        </div>
+                      )}
                     </div>
                   ) : (
                     <div className="relative">
