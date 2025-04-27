@@ -572,8 +572,58 @@ export function App() {
                           setIsDropdownOpen(true);
                         }}
                         onFocus={() => setIsDropdownOpen(true)}
+                        onBlur={() => {
+                          // On blur, auto-select the topmost filtered option if not already selected
+                          if (filteredDrugs.length > 0 && selectedDrug !== filteredDrugs[0].name) {
+                            setSelectedDrug(filteredDrugs[0].name);
+                            setSearchTerm(filteredDrugs[0].name);
+                            // Set initial values for the selected drug
+                            const drug = filteredDrugs[0];
+                            if (drug.doses.length > 0) {
+                              const firstDose = drug.doses[0];
+                              if (firstDose.dose !== null) {
+                                setSelectedDose(firstDose.dose);
+                                setCustomDose("");
+                              } else {
+                                setSelectedDose("custom");
+                                setCustomDose("");
+                              }
+                              if (firstDose.forms.length > 0) {
+                                setSelectedForm(firstDose.forms[0].form);
+                                setSelectedMethod(firstDose.forms[0].methods[0]);
+                              }
+                            }
+                          }
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            // On Enter, auto-select the topmost filtered option if not already selected
+                            if (filteredDrugs.length > 0 && selectedDrug !== filteredDrugs[0].name) {
+                              setSelectedDrug(filteredDrugs[0].name);
+                              setSearchTerm(filteredDrugs[0].name);
+                              // Set initial values for the selected drug
+                              const drug = filteredDrugs[0];
+                              if (drug.doses.length > 0) {
+                                const firstDose = drug.doses[0];
+                                if (firstDose.dose !== null) {
+                                  setSelectedDose(firstDose.dose);
+                                  setCustomDose("");
+                                } else {
+                                  setSelectedDose("custom");
+                                  setCustomDose("");
+                                }
+                                if (firstDose.forms.length > 0) {
+                                  setSelectedForm(firstDose.forms[0].form);
+                                  setSelectedMethod(firstDose.forms[0].methods[0]);
+                                }
+                              }
+                            }
+                          }
+                        }}
                         className="appearance-none bg-slate-800 border border-slate-600 text-white py-3 px-4 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         placeholder="Search or select antibiotic..."
+                        autoComplete="off"
+                        spellCheck={false}
                       />
                       <button
                         type="button"
@@ -591,19 +641,20 @@ export function App() {
                             No antibiotics found
                           </div>
                         ) : (
-                          filteredDrugs.map((drug) => (
+                          filteredDrugs.map((drug, idx) => (
                             <div
                               key={drug.name}
                               className={`relative cursor-pointer select-none py-2 pl-3 pr-9 ${
                                 drug.name === selectedDrug
                                   ? "bg-blue-600 text-white"
-                                  : "text-gray-900 hover:bg-blue-50"
+                                  : idx === 0
+                                    ? "bg-blue-600 text-white"
+                                    : "text-gray-900 hover:bg-blue-50"
                               }`}
                               onClick={() => {
                                 setSelectedDrug(drug.name);
                                 setSearchTerm(drug.name);
                                 setIsDropdownOpen(false);
-                                
                                 // Set initial values for the selected drug
                                 if (drug.doses.length > 0) {
                                   const firstDose = drug.doses[0];
@@ -614,7 +665,6 @@ export function App() {
                                     setSelectedDose("custom");
                                     setCustomDose("");
                                   }
-                                  
                                   if (firstDose.forms.length > 0) {
                                     setSelectedForm(firstDose.forms[0].form);
                                     setSelectedMethod(firstDose.forms[0].methods[0]);
