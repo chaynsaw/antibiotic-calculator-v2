@@ -986,7 +986,7 @@ export function App() {
           </div>
 
           <div className="mt-8 text-center">
-            <span className="font-bold">Questions or Feedback?</span> Reach out to ***
+            <span className="font-bold">Questions or Feedback?</span> Reach out to <a href="mailto:hello@ecorxchoice.com" className="underline text-blue-400 hover:text-blue-600">hello@ecorxchoice.com</a>
           </div>
         </div>
       )}
