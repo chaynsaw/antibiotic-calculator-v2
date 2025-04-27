@@ -938,7 +938,7 @@ export function App() {
       {activePage === "about" && (
         <div className="max-w-2xl mx-auto py-10 px-4">
           <img
-            src="/src/assets/our-team-recreation.jpg"
+            src="https://i.imgflip.com/9s3qe2.jpg"
             alt="Three people in pink outfits, recreation (not actual photo)"
             className="mx-auto mb-8 rounded-lg shadow-lg"
             style={{ maxWidth: '100%', height: 'auto' }}
