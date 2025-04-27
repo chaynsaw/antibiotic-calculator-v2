@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { ChevronDown, Leaf, Pill, Droplet, LineChart, Loader } from "lucide-react";
 import { getWasteItems, getAvailableDrugs, type WasteItem, type DrugOption } from "./utils/wasteCalculator";
+import { Navbar } from "./Navbar";
+import ourTeamImg from './assets/our-team-recreation.jpg';
 
 // Define types for regimen management
 interface Regimen {
@@ -17,12 +19,7 @@ interface Regimen {
 }
 
 export function App() {
-  // Add title effect
-  useEffect(() => {
-    if (window.location.hostname === 'localhost') {
-      document.title = '(LOCAL) Antibiotic Waste Calculator';
-    }
-  }, []);
+  const [activePage, setActivePage] = useState<"calculator" | "about">("calculator");
 
   const [drugs, setDrugs] = useState<DrugOption[]>([]);
   const [selectedDrug, setSelectedDrug] = useState<string>("");
@@ -540,83 +537,48 @@ export function App() {
 
   return (
     <div className="bg-gradient-to-b from-slate-800 to-slate-900 min-h-screen text-white">
-      <header className="pt-8 pb-4 px-6 md:px-12">
-        <div className="max-w-4xl mx-auto">
-          <div className="flex items-center space-x-2 mb-2">
-            <Leaf className="text-green-400" size={28} />
-            <h1 className="text-4xl font-bold tracking-tight">
-              Antibiotic Waste Calculator
-            </h1>
-          </div>
-          <p className="text-slate-300 text-lg max-w-4xl">
-            A tool to help you calculate and compare waste from antibiotic regimens.
-          </p>
-        </div>
-      </header>
-      <main className="px-6 md:px-12 pb-16">
-        <div className="max-w-4xl mx-auto">
-          <div className="bg-slate-700/50 backdrop-blur-sm rounded-lg p-6 shadow-xl border border-slate-600">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-              <div className="relative">
-                <label className="block text-sm font-medium text-slate-300 mb-1">
-                  Antibiotic
-                </label>
-                <div className="relative space-y-2">
-                  <div className="relative" ref={dropdownRef}>
-                    <div className="relative">
-                      <input
-                        type="text"
-                        id="drug"
-                        value={searchTerm}
-                        onChange={(e) => {
-                          setSearchTerm(e.target.value);
-                          setIsDropdownOpen(true);
-                          setHighlightedIndex(0);
-                        }}
-                        onFocus={() => {
-                          setIsDropdownOpen(true);
-                          setHighlightedIndex(0);
-                        }}
-                        onBlur={() => {
-                          // On blur, auto-select the topmost filtered option if not already selected
-                          if (filteredDrugs.length > 0 && selectedDrug !== filteredDrugs[highlightedIndex]?.name) {
-                            const drug = filteredDrugs[highlightedIndex];
-                            setSelectedDrug(drug.name);
-                            setSearchTerm(drug.name);
-                            // Set initial values for the selected drug
-                            if (drug.doses.length > 0) {
-                              const firstDose = drug.doses[0];
-                              if (firstDose.dose !== null) {
-                                setSelectedDose(firstDose.dose);
-                                setCustomDose("");
-                              } else {
-                                setSelectedDose("custom");
-                                setCustomDose("");
-                              }
-                              if (firstDose.forms.length > 0) {
-                                setSelectedForm(firstDose.forms[0].form);
-                                setSelectedMethod(firstDose.forms[0].methods[0]);
-                              }
-                            }
-                          }
-                        }}
-                        onKeyDown={(e) => {
-                          if (e.key === "ArrowDown") {
-                            e.preventDefault();
-                            setHighlightedIndex((prev) =>
-                              Math.min(prev + 1, filteredDrugs.length - 1)
-                            );
-                          } else if (e.key === "ArrowUp") {
-                            e.preventDefault();
-                            setHighlightedIndex((prev) =>
-                              Math.max(prev - 1, 0)
-                            );
-                          } else if (e.key === "Enter") {
-                            if (filteredDrugs.length > 0) {
+      <Navbar active={activePage} onSelect={setActivePage} />
+      {activePage === "calculator" && (
+        <main className="px-6 md:px-12 pb-16">
+          <div className="max-w-4xl mx-auto">
+            <header className="pt-8 pb-4">
+              <div className="flex items-center space-x-2 mb-2">
+                <h1 className="text-4xl font-bold tracking-tight">
+                  Calculator
+                </h1>
+              </div>
+              <p className="text-slate-300 text-lg max-w-4xl">
+                A tool to help you calculate and compare waste from antibiotic regimens.
+              </p>
+            </header>
+            <div className="bg-slate-700/50 backdrop-blur-sm rounded-lg p-6 shadow-xl border border-slate-600">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                <div className="relative">
+                  <label className="block text-sm font-medium text-slate-300 mb-1">
+                    Antibiotic
+                  </label>
+                  <div className="relative space-y-2">
+                    <div className="relative" ref={dropdownRef}>
+                      <div className="relative">
+                        <input
+                          type="text"
+                          id="drug"
+                          value={searchTerm}
+                          onChange={(e) => {
+                            setSearchTerm(e.target.value);
+                            setIsDropdownOpen(true);
+                            setHighlightedIndex(0);
+                          }}
+                          onFocus={() => {
+                            setIsDropdownOpen(true);
+                            setHighlightedIndex(0);
+                          }}
+                          onBlur={() => {
+                            // On blur, auto-select the topmost filtered option if not already selected
+                            if (filteredDrugs.length > 0 && selectedDrug !== filteredDrugs[highlightedIndex]?.name) {
                               const drug = filteredDrugs[highlightedIndex];
                               setSelectedDrug(drug.name);
                               setSearchTerm(drug.name);
-                              setIsDropdownOpen(false);
                               // Set initial values for the selected drug
                               if (drug.doses.length > 0) {
                                 const firstDose = drug.doses[0];
@@ -633,38 +595,21 @@ export function App() {
                                 }
                               }
                             }
-                          }
-                        }}
-                        className="appearance-none bg-slate-800 border border-slate-600 text-white py-3 px-4 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        placeholder="Search or select antibiotic..."
-                        autoComplete="off"
-                        spellCheck={false}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                        className="absolute inset-y-0 right-0 flex items-center px-2 focus:outline-none"
-                      >
-                        <ChevronDown className="h-4 w-4 text-gray-400" aria-hidden="true" />
-                      </button>
-                    </div>
-                    
-                    {isDropdownOpen && (
-                      <div className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-sm shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                        {filteredDrugs.length === 0 ? (
-                          <div className="relative cursor-default select-none py-2 px-3 text-gray-500">
-                            No antibiotics found
-                          </div>
-                        ) : (
-                          filteredDrugs.map((drug, idx) => (
-                            <div
-                              key={drug.name}
-                              className={`relative cursor-pointer select-none py-2 pl-3 pr-9 ${
-                                idx === highlightedIndex
-                                  ? "bg-blue-600 text-white"
-                                  : "text-gray-900 hover:bg-blue-50"
-                              }`}
-                              onClick={() => {
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.key === "ArrowDown") {
+                              e.preventDefault();
+                              setHighlightedIndex((prev) =>
+                                Math.min(prev + 1, filteredDrugs.length - 1)
+                              );
+                            } else if (e.key === "ArrowUp") {
+                              e.preventDefault();
+                              setHighlightedIndex((prev) =>
+                                Math.max(prev - 1, 0)
+                              );
+                            } else if (e.key === "Enter") {
+                              if (filteredDrugs.length > 0) {
+                                const drug = filteredDrugs[highlightedIndex];
                                 setSelectedDrug(drug.name);
                                 setSearchTerm(drug.name);
                                 setIsDropdownOpen(false);
@@ -683,262 +628,369 @@ export function App() {
                                     setSelectedMethod(firstDose.forms[0].methods[0]);
                                   }
                                 }
-                                setHighlightedIndex(0);
-                              }}
-                            >
-                              {drug.name}
+                              }
+                            }
+                          }}
+                          className="appearance-none bg-slate-800 border border-slate-600 text-white py-3 px-4 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          placeholder="Search or select antibiotic..."
+                          autoComplete="off"
+                          spellCheck={false}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                          className="absolute inset-y-0 right-0 flex items-center px-2 focus:outline-none"
+                        >
+                          <ChevronDown className="h-4 w-4 text-gray-400" aria-hidden="true" />
+                        </button>
+                      </div>
+                      
+                      {isDropdownOpen && (
+                        <div className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-sm shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                          {filteredDrugs.length === 0 ? (
+                            <div className="relative cursor-default select-none py-2 px-3 text-gray-500">
+                              No antibiotics found
                             </div>
-                          ))
+                          ) : (
+                            filteredDrugs.map((drug, idx) => (
+                              <div
+                                key={drug.name}
+                                className={`relative cursor-pointer select-none py-2 pl-3 pr-9 ${
+                                  idx === highlightedIndex
+                                    ? "bg-blue-600 text-white"
+                                    : "text-gray-900 hover:bg-blue-50"
+                                }`}
+                                onClick={() => {
+                                  setSelectedDrug(drug.name);
+                                  setSearchTerm(drug.name);
+                                  setIsDropdownOpen(false);
+                                  // Set initial values for the selected drug
+                                  if (drug.doses.length > 0) {
+                                    const firstDose = drug.doses[0];
+                                    if (firstDose.dose !== null) {
+                                      setSelectedDose(firstDose.dose);
+                                      setCustomDose("");
+                                    } else {
+                                      setSelectedDose("custom");
+                                      setCustomDose("");
+                                    }
+                                    if (firstDose.forms.length > 0) {
+                                      setSelectedForm(firstDose.forms[0].form);
+                                      setSelectedMethod(firstDose.forms[0].methods[0]);
+                                    }
+                                  }
+                                  setHighlightedIndex(0);
+                                }}
+                              >
+                                {drug.name}
+                              </div>
+                            ))
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <div className="relative">
+                  <label className="block text-sm font-medium text-slate-300 mb-1">
+                    Dose
+                  </label>
+                  <div className="relative space-y-2">
+                    {variableDoses.length > 0 ? (
+                      <div className="relative">
+                        <select
+                          value={selectedDose}
+                          onChange={(e) => handleDoseChange(e.target.value)}
+                          className="appearance-none bg-slate-800 border border-slate-600 text-white py-3 px-4 pr-8 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        >
+                          {fixedDoses.map(d => (
+                            <option key={d.dose!} value={d.dose!}>{d.dose} mg</option>
+                          ))}
+                          <option value="custom">Custom dose</option>
+                        </select>
+                        {selectedDose === "custom" && (
+                          <input
+                            type="number"
+                            value={customDose}
+                            onChange={(e) => handleCustomDoseChange(e.target.value)}
+                            placeholder={getDosePlaceholder()}
+                            className="appearance-none bg-slate-800 border border-slate-600 text-white py-3 px-4 rounded-md w-full mt-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          />
                         )}
+                        {doseError && (
+                          <p className="text-red-400 text-sm">{doseError}</p>
+                        )}
+                        {selectedDose !== "custom" && (
+                          <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                            <ChevronDown size={18} className="text-slate-400" />
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="relative">
+                        <select
+                          value={selectedDose}
+                          onChange={(e) => handleDoseChange(e.target.value)}
+                          className="appearance-none bg-slate-800 border border-slate-600 text-white py-3 px-4 pr-8 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        >
+                          {fixedDoses.map(d => (
+                            <option key={d.dose!} value={d.dose!}>{d.dose} mg</option>
+                          ))}
+                        </select>
+                        <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                          <ChevronDown size={18} className="text-slate-400" />
+                        </div>
                       </div>
                     )}
                   </div>
                 </div>
-              </div>
-              <div className="relative">
-                <label className="block text-sm font-medium text-slate-300 mb-1">
-                  Dose
-                </label>
-                <div className="relative space-y-2">
-                  {variableDoses.length > 0 ? (
-                    <div className="relative">
-                      <select
-                        value={selectedDose}
-                        onChange={(e) => handleDoseChange(e.target.value)}
-                        className="appearance-none bg-slate-800 border border-slate-600 text-white py-3 px-4 pr-8 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      >
-                        {fixedDoses.map(d => (
-                          <option key={d.dose!} value={d.dose!}>{d.dose} mg</option>
-                        ))}
-                        <option value="custom">Custom dose</option>
-                      </select>
-                      {selectedDose === "custom" && (
-                        <input
-                          type="number"
-                          value={customDose}
-                          onChange={(e) => handleCustomDoseChange(e.target.value)}
-                          placeholder={getDosePlaceholder()}
-                          className="appearance-none bg-slate-800 border border-slate-600 text-white py-3 px-4 rounded-md w-full mt-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        />
-                      )}
-                      {doseError && (
-                        <p className="text-red-400 text-sm">{doseError}</p>
-                      )}
-                      {selectedDose !== "custom" && (
-                        <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                          <ChevronDown size={18} className="text-slate-400" />
-                        </div>
-                      )}
+                <div className="relative">
+                  <label className="block text-sm font-medium text-slate-300 mb-1">
+                    Administration Method
+                  </label>
+                  <div className="relative">
+                    <select
+                      value={selectedForm}
+                      onChange={(e) => {
+                        setSelectedForm(e.target.value);
+                        const newMethods = availableForms
+                          .find(f => f.form === e.target.value)?.methods || [];
+                        if (newMethods.length > 0) {
+                          setSelectedMethod(newMethods[0]);
+                        } else {
+                          setSelectedMethod("");
+                        }
+                      }}
+                      disabled={!availableForms.length}
+                      className="appearance-none bg-slate-800 border border-slate-600 text-white py-3 px-4 pr-8 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {availableForms.map(f => (
+                        <option key={f.form} value={f.form}>{f.form}</option>
+                      ))}
+                    </select>
+                    <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                      <ChevronDown size={18} className="text-slate-400" />
                     </div>
+                  </div>
+                </div>
+                <div className="relative">
+                  <label className="block text-sm font-medium text-slate-300 mb-1">
+                    Form
+                  </label>
+                  <div className="relative">
+                    <select
+                      value={selectedMethod}
+                      onChange={(e) => setSelectedMethod(e.target.value)}
+                      disabled={!availableMethods.length}
+                      className="appearance-none bg-slate-800 border border-slate-600 text-white py-3 px-4 pr-8 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {availableMethods.map(m => (
+                        <option key={m} value={m}>{m}</option>
+                      ))}
+                    </select>
+                    <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                      <ChevronDown size={18} className="text-slate-400" />
+                    </div>
+                  </div>
+                </div>
+                <div className="relative">
+                  <label className="block text-sm font-medium text-slate-300 mb-1">
+                    Frequency
+                  </label>
+                  <div className="relative">
+                    <select
+                      value={frequency}
+                      onChange={(e) => setFrequency(e.target.value)}
+                      className="appearance-none bg-slate-800 border border-slate-600 text-white py-3 px-4 pr-8 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                      {frequencyOptions.map(option => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                    <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                      <ChevronDown size={18} className="text-slate-400" />
+                    </div>
+                  </div>
+                </div>
+                <div className="relative">
+                  <label className="block text-sm font-medium text-slate-300 mb-1">
+                    Duration (Days)
+                  </label>
+                  <div className="relative space-y-2">
+                    <input
+                      type="number"
+                      value={duration}
+                      onChange={(e) => handleDurationChange(e.target.value)}
+                      placeholder="Enter number of days"
+                      min="1"
+                      step="1"
+                      className="appearance-none bg-slate-800 border border-slate-600 text-white py-3 px-4 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                    {durationError && (
+                      <p className="text-red-400 text-sm">{durationError}</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+              <div className="mt-4">
+                <button
+                  onClick={handleCalculate}
+                  disabled={loading}
+                  className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold py-3 px-6 rounded-md shadow-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                >
+                  {loading ? (
+                    <>
+                      <Loader size={20} className="animate-spin" />
+                      <span>Calculating...</span>
+                    </>
                   ) : (
-                    <div className="relative">
-                      <select
-                        value={selectedDose}
-                        onChange={(e) => handleDoseChange(e.target.value)}
-                        className="appearance-none bg-slate-800 border border-slate-600 text-white py-3 px-4 pr-8 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                      >
-                        {fixedDoses.map(d => (
-                          <option key={d.dose!} value={d.dose!}>{d.dose} mg</option>
-                        ))}
-                      </select>
-                      <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                        <ChevronDown size={18} className="text-slate-400" />
-                      </div>
-                    </div>
+                    <>
+                      <LineChart size={20} />
+                      <span>Calculate Waste</span>
+                    </>
                   )}
-                </div>
+                </button>
               </div>
-              <div className="relative">
-                <label className="block text-sm font-medium text-slate-300 mb-1">
-                  Administration Method
-                </label>
-                <div className="relative">
-                  <select
-                    value={selectedForm}
-                    onChange={(e) => {
-                      setSelectedForm(e.target.value);
-                      const newMethods = availableForms
-                        .find(f => f.form === e.target.value)?.methods || [];
-                      if (newMethods.length > 0) {
-                        setSelectedMethod(newMethods[0]);
-                      } else {
-                        setSelectedMethod("");
-                      }
-                    }}
-                    disabled={!availableForms.length}
-                    className="appearance-none bg-slate-800 border border-slate-600 text-white py-3 px-4 pr-8 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {availableForms.map(f => (
-                      <option key={f.form} value={f.form}>{f.form}</option>
-                    ))}
-                  </select>
-                  <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                    <ChevronDown size={18} className="text-slate-400" />
-                  </div>
+              <div className="mt-8">
+                <div className="flex items-center space-x-2 mb-4">
+                  <LineChart className="text-blue-400" size={20} />
+                  <h2 className="text-xl font-semibold">Results</h2>
                 </div>
-              </div>
-              <div className="relative">
-                <label className="block text-sm font-medium text-slate-300 mb-1">
-                  Form
-                </label>
-                <div className="relative">
-                  <select
-                    value={selectedMethod}
-                    onChange={(e) => setSelectedMethod(e.target.value)}
-                    disabled={!availableMethods.length}
-                    className="appearance-none bg-slate-800 border border-slate-600 text-white py-3 px-4 pr-8 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {availableMethods.map(m => (
-                      <option key={m} value={m}>{m}</option>
-                    ))}
-                  </select>
-                  <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                    <ChevronDown size={18} className="text-slate-400" />
-                  </div>
-                </div>
-              </div>
-              <div className="relative">
-                <label className="block text-sm font-medium text-slate-300 mb-1">
-                  Frequency
-                </label>
-                <div className="relative">
-                  <select
-                    value={frequency}
-                    onChange={(e) => setFrequency(e.target.value)}
-                    className="appearance-none bg-slate-800 border border-slate-600 text-white py-3 px-4 pr-8 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  >
-                    {frequencyOptions.map(option => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                  <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-                    <ChevronDown size={18} className="text-slate-400" />
-                  </div>
-                </div>
-              </div>
-              <div className="relative">
-                <label className="block text-sm font-medium text-slate-300 mb-1">
-                  Duration (Days)
-                </label>
-                <div className="relative space-y-2">
-                  <input
-                    type="number"
-                    value={duration}
-                    onChange={(e) => handleDurationChange(e.target.value)}
-                    placeholder="Enter number of days"
-                    min="1"
-                    step="1"
-                    className="appearance-none bg-slate-800 border border-slate-600 text-white py-3 px-4 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  />
-                  {durationError && (
-                    <p className="text-red-400 text-sm">{durationError}</p>
-                  )}
-                </div>
-              </div>
-            </div>
-            <div className="mt-4">
-              <button
-                onClick={handleCalculate}
-                disabled={loading}
-                className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold py-3 px-6 rounded-md shadow-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
-              >
                 {loading ? (
+                  <div className="text-center py-8 text-slate-300">Loading waste data...</div>
+                ) : error ? (
+                  <div className="text-center py-8 text-red-400">{error}</div>
+                ) : wasteItems.length > 0 ? (
                   <>
-                    <Loader size={20} className="animate-spin" />
-                    <span>Calculating...</span>
-                  </>
-                ) : (
-                  <>
-                    <LineChart size={20} />
-                    <span>Calculate Waste</span>
-                  </>
-                )}
-              </button>
-            </div>
-            <div className="mt-8">
-              <div className="flex items-center space-x-2 mb-4">
-                <LineChart className="text-blue-400" size={20} />
-                <h2 className="text-xl font-semibold">Results</h2>
-              </div>
-              {loading ? (
-                <div className="text-center py-8 text-slate-300">Loading waste data...</div>
-              ) : error ? (
-                <div className="text-center py-8 text-red-400">{error}</div>
-              ) : wasteItems.length > 0 ? (
-                <>
-                  {/* Show current calculation */}
-                  <div className="bg-slate-800/80 rounded-lg p-5 border border-slate-700 mb-6">
-                    <div className="flex flex-col space-y-4">
-                      <div className="flex items-center justify-between">
-                        <span className="text-slate-300">
-                          Plastic waste per dose:
-                        </span>
-                        <span className="text-xl font-bold text-white">
-                          {perDoseWaste.toFixed(1)} g
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-slate-300">
-                          Total doses ({duration} days, {selectedFrequency.label}):
-                        </span>
-                        <span className="text-lg font-medium text-white">
-                          {totalDoses} doses
-                        </span>
-                      </div>
-                      <div className="flex flex-col space-y-1">
+                    {/* Show current calculation */}
+                    <div className="bg-slate-800/80 rounded-lg p-5 border border-slate-700 mb-6">
+                      <div className="flex flex-col space-y-4">
                         <div className="flex items-center justify-between">
                           <span className="text-slate-300">
-                            Total plastic waste:
+                            Plastic waste per dose:
                           </span>
-                          <span className="text-2xl font-bold text-white">
-                            {totalWaste.toFixed(1)} g
+                          <span className="text-xl font-bold text-white">
+                            {perDoseWaste.toFixed(1)} g
                           </span>
                         </div>
-                        <p className="text-base text-slate-400 text-right">For reference: a standard plastic water bottle weighs ~10g</p>
+                        <div className="flex items-center justify-between">
+                          <span className="text-slate-300">
+                            Total doses ({duration} days, {selectedFrequency.label}):
+                          </span>
+                          <span className="text-lg font-medium text-white">
+                            {totalDoses} doses
+                          </span>
+                        </div>
+                        <div className="flex flex-col space-y-1">
+                          <div className="flex items-center justify-between">
+                            <span className="text-slate-300">
+                              Total plastic waste:
+                            </span>
+                            <span className="text-2xl font-bold text-white">
+                              {totalWaste.toFixed(1)} g
+                            </span>
+                          </div>
+                          <p className="text-base text-slate-400 text-right">For reference: a standard plastic water bottle weighs ~10g</p>
+                        </div>
+                      </div>
+                      <div className="mt-2 w-full bg-slate-700 rounded-full h-2.5">
+                        <div
+                          className="bg-gradient-to-r from-green-500 to-blue-500 h-2.5 rounded-full"
+                          style={{
+                            width: `${Math.min((totalWaste / 500) * 100, 100)}%`,
+                          }}
+                        ></div>
                       </div>
                     </div>
-                    <div className="mt-2 w-full bg-slate-700 rounded-full h-2.5">
-                      <div
-                        className="bg-gradient-to-r from-green-500 to-blue-500 h-2.5 rounded-full"
-                        style={{
-                          width: `${Math.min((totalWaste / 500) * 100, 100)}%`,
-                        }}
-                      ></div>
+                    <div className="grid grid-cols-1 gap-4 mb-6">
+                      <button
+                        onClick={saveCurrentRegimen}
+                        className="bg-[#4477FF] hover:bg-blue-600 text-white font-semibold py-4 px-6 rounded-xl shadow-lg transition-colors duration-200 text-lg"
+                      >
+                        Save regimen
+                      </button>
                     </div>
+                  </>
+                ) : (
+                  <div className="text-center py-8 text-slate-300">
+                    {regimens.length > 0 
+                      ? <span dangerouslySetInnerHTML={{ __html: 'Enter details for another regimen above, then Calculate Waste and <span class="font-bold">Save Regimen</span> to compare' }} />
+                      : "Enter antibiotic details and click Calculate Waste to see results"
+                    }
                   </div>
-                  <div className="grid grid-cols-1 gap-4 mb-6">
-                    <button
-                      onClick={saveCurrentRegimen}
-                      className="bg-[#4477FF] hover:bg-blue-600 text-white font-semibold py-4 px-6 rounded-xl shadow-lg transition-colors duration-200 text-lg"
-                    >
-                      Save regimen
-                    </button>
-                  </div>
-                </>
-              ) : (
-                <div className="text-center py-8 text-slate-300">
-                  {regimens.length > 0 
-                    ? <span dangerouslySetInnerHTML={{ __html: 'Enter details for another regimen above, then Calculate Waste and <span class="font-bold">Save Regimen</span> to compare' }} />
-                    : "Enter antibiotic details and click Calculate Waste to see results"
-                  }
-                </div>
-              )}
+                )}
+              </div>
+            </div>
+
+            {/* Show saved regimens in a separate card below the form */}
+            {regimens.length > 0 && (
+              <div className="mt-8 bg-slate-700/50 backdrop-blur-sm rounded-lg p-6 shadow-xl border border-slate-600">
+                <h3 className="text-xl font-semibold mb-2">Saved Regimens</h3>
+                {regimens.map(regimen => (
+                  <RegimenResult key={regimen.id} regimen={regimen} />
+                ))}
+              </div>
+            )}
+          </div>
+        </main>
+      )}
+      {activePage === "about" && (
+        <div className="max-w-2xl mx-auto py-10 px-4">
+          <img
+            src={ourTeamImg}
+            alt="Three people in pink outfits, recreation (not actual photo)"
+            className="mx-auto mb-8 rounded-lg shadow-lg"
+            style={{ maxWidth: '100%', height: 'auto' }}
+          />
+          <h1 className="text-2xl font-bold text-center underline mb-8">OUR TEAM</h1>
+          <div className="mb-6">
+            <span className="font-bold underline">CONCEPTION / DESIGN:</span>
+            <span> Pam Lee, Hugh Gordon, Chaynor Hsiao, Gary Fong</span>
+          </div>
+          <div className="mb-6">
+            <span className="font-bold underline">DATA COLLECTION:</span>
+            <span> Gary Fong, Misty Vu, Tien Dinh, Marina Nguyen, Pam Lee, Sean Oh, Grace Lee</span>
+          </div>
+          <div className="mb-6">
+            <span className="font-bold underline">CODING STUFF:</span>
+            <span> Hugh Gordon, Herbert Lee, Chaynor Hsiao</span>
+          </div>
+
+          <h2 className="text-xl font-bold underline text-center mt-12 mb-6 tracking-widest">ABOUT ECORXCHOICE</h2>
+
+          <div className="mb-6">
+            <span className="font-bold underline">Background</span>
+            <p className="mt-2">
+              EcoRxChoice was developed by Pam Lee, Hugh Gordon, and Gary Fong to connect the fields of antimicrobial stewardship and healthcare sustainability. They want to provide clinicians with a simple way of calculating the plastic waste associated with an antimicrobial regimen, and to compare waste among different regimens.<br /><br />
+              Mounting evidence suggests that the sequela of plastic waste are associated with significant <a href="https://www.nature.com/articles/s41591-024-03453-1" target="_blank" rel="noopener noreferrer" className="underline text-blue-400 hover:text-blue-600">health</a> <a href="https://www.nejm.org/doi/10.1056/NEJMoa2309822" target="_blank" rel="noopener noreferrer" className="underline text-blue-400 hover:text-blue-600">impacts</a>. The US healthcare sector produces approximately <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC7068768/" target="_blank" rel="noopener noreferrer" className="underline text-blue-400 hover:text-blue-600">1.7 million tons</a> of plastic waste each year. Evidence-based and patient-centered strategies such as favoring oral antimicrobials when clinically appropriate and providing durations of therapy can reduce plastic waste from pharmaceuticals. EcoRxChoice seeks to make quantification of such waste easy and accessible for anyone interested.
+            </p>
+          </div>
+
+          <div className="mb-6">
+            <span className="font-bold underline">Bios</span>
+            <div className="mt-2 space-y-6">
+              <div>
+                <span className="font-bold underline">Pam Lee, MD:</span>
+                <span> Pam is an infectious disease specialist at Harbor-UCLA Medical Center. Much of her medical training took place in LA County's Department of Health Services, and as such she is deeply committed to providing healthcare for LA's safety-net populations. Pam's overarching academic interest is the intersection of healthcare delivery and environmental sustainability, with specific focuses on infection prevention and control and antimicrobial stewardship. Her passion for climate work stems from knowing that patients like hers bear the brunt of the adverse effects of climate change and pollution, such as escalated health risks, economic challenges, and social disparities. During her free time she plays board games (boo Kyle), hikes, and cares for her many houseplants with varying levels of success.</span>
+              </div>
+              <div>
+                <span className="font-bold underline">Gary Fong, PharmD:</span>
+                <span> Gary is an infectious diseases pharmacist at Harbor-UCLA Medical Center and an Assistant Professor at Chapman University School of Pharmacy. He completed his post-graduate training at UCSF Medical Center in San Francisco and Baylor St. Luke's Medical Center in Houston. His research interests revolve around better understanding and improving the manage of candidemia, especially in the context of increasing antifungal resistance. In his time in LA County's Department of Health Services, he has become increasingly interested in finding practical therapeutic solutions for patients that are efficacious, safe, and convenient. Gary also serves as a member on IDSA's Antimicrobial Stewardship Curriculum Subcommittee. His hobbies include recipe-less cooking, exploring the craft beer world, being a dachshund dad, and spending quality time with his wife and wild toddler.</span>
+              </div>
+              <div>
+                <span className="font-bold underline">Hugh Gordon, MD:</span>
+                <span> Hugh is Chief Medical Information Officer at LA General Medical Center in Los Angeles County. Passionate about combining medicine and technology, Hugh is both an internal medicine physician and a seasoned entrepreneur and technologist with expertise in digital security, compliance, enterprise information technology management and software engineering. Prior to his clinical career, Hugh was Co-Founder and Chief Technology Officer of Akido Labs, a Y Combinator backed care delivery platform dedicated to ensuring our most vulnerable communities thrive. Hugh started his career as a Site Reliability engineer and technical lead at Google. He holds a Bachelor of Science in Computer Engineering from Columbia University and an MD from the University of Southern California's Keck School of Medicine. His hobbies include backpacking and cooking complicated meals with his wife and young daughters.</span>
+              </div>
             </div>
           </div>
 
-          {/* Show saved regimens in a separate card below the form */}
-          {regimens.length > 0 && (
-            <div className="mt-8 bg-slate-700/50 backdrop-blur-sm rounded-lg p-6 shadow-xl border border-slate-600">
-              <h3 className="text-xl font-semibold mb-2">Saved Regimens</h3>
-              {regimens.map(regimen => (
-                <RegimenResult key={regimen.id} regimen={regimen} />
-              ))}
-            </div>
-          )}
+          <div className="mt-8 text-center">
+            <span className="font-bold">Questions or Feedback?</span> Reach out to ***
+          </div>
         </div>
-      </main>
+      )}
       <footer className="py-4 px-6 text-center text-sm text-slate-400">
         <p>
           © 2025 Antibiotic Waste Calculator • Helping reduce environmental
