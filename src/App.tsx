@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from "react";
 import { ChevronDown, Leaf, Pill, Droplet, LineChart, Loader } from "lucide-react";
 import { getWasteItems, getAvailableDrugs, type WasteItem, type DrugOption } from "./utils/wasteCalculator";
 import { Navbar } from "./Navbar";
-import ourTeamImg from './assets/our-team-recreation.jpg';
 
 // Define types for regimen management
 interface Regimen {
@@ -939,7 +938,7 @@ export function App() {
       {activePage === "about" && (
         <div className="max-w-2xl mx-auto py-10 px-4">
           <img
-            src={ourTeamImg}
+            src="/src/assets/our-team-recreation.jpg"
             alt="Three people in pink outfits, recreation (not actual photo)"
             className="mx-auto mb-8 rounded-lg shadow-lg"
             style={{ maxWidth: '100%', height: 'auto' }}
