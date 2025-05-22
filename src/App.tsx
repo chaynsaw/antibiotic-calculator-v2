@@ -534,6 +534,9 @@ export function App() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Add this state near the other state declarations at the top of the component
+  const [showDetails, setShowDetails] = useState(false);
+
   return (
     <div className="bg-gradient-to-b from-slate-800 to-slate-900 min-h-screen text-white">
       <Navbar active={activePage} onSelect={setActivePage} />
@@ -921,6 +924,63 @@ export function App() {
                         ></div>
                       </div>
                     </div>
+
+                    {/* Add Detailed Breakdown section */}
+                    <div className="mb-6">
+                      <button
+                        onClick={() => setShowDetails(prev => !prev)}
+                        className="w-full bg-slate-800/80 hover:bg-slate-700/80 text-white font-semibold py-3 px-6 rounded-lg border border-slate-700 transition-colors duration-200 flex items-center justify-between"
+                      >
+                        <span className="flex items-center space-x-2">
+                          <LineChart size={20} className="text-blue-400" />
+                          <span className="text-lg">Detailed Breakdown</span>
+                        </span>
+                        <ChevronDown
+                          size={18}
+                          className={`text-slate-400 transition-transform duration-200 ${
+                            showDetails ? "transform rotate-180" : ""
+                          }`}
+                        />
+                      </button>
+                      {showDetails && (
+                        <div className="mt-4 bg-slate-800/80 rounded-lg p-5 border border-slate-700">
+                          <ul className="divide-y divide-slate-700">
+                            {wasteItems.map((item, index) => {
+                              const isIVTubing = item.item.toLowerCase().includes('iv tubing');
+                              const itemTotalWaste = calculateTotalWasteForItem(item, totalDoses, durationDays);
+                              
+                              return (
+                                <li
+                                  key={index}
+                                  className="py-3 md:py-4 flex flex-col md:flex-row md:justify-between md:items-start gap-2 md:gap-4"
+                                >
+                                  <div className="flex items-center space-x-2">
+                                    {index % 2 === 0 ? (
+                                      <Pill className="text-blue-400 shrink-0" size={16} />
+                                    ) : (
+                                      <Droplet className="text-green-400 shrink-0" size={16} />
+                                    )}
+                                    <span className="text-sm md:text-base text-white font-medium">{item.item}</span>
+                                  </div>
+                                  <div className="text-right">
+                                    <div className="text-sm md:text-base text-white font-medium">
+                                      {item.quantity} × {item.weight.toFixed(1)} g = {item.totalWaste.toFixed(1)} g per {isIVTubing ? '4 days' : 'dose'}
+                                    </div>
+                                    <div className="text-xs md:text-sm text-slate-400 mt-1">
+                                      {isIVTubing ? 
+                                        `Changed every 4 days (${getIVTubingChanges(durationDays)} changes) - ` : 
+                                        `${totalDoses} doses - `}
+                                      Total: {itemTotalWaste.toFixed(1)} g
+                                    </div>
+                                  </div>
+                                </li>
+                              );
+                            })}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+
                     <div className="grid grid-cols-1 gap-4 mb-6">
                       <button
                         onClick={saveCurrentRegimen}
