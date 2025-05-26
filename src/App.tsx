@@ -203,7 +203,7 @@ export function App() {
       await new Promise(resolve => setTimeout(resolve, 500));
       
       const dose = selectedDose === "custom" ? parseFloat(customDose) : selectedDose;
-      const items = await getWasteItems(selectedDrug, dose, selectedMethod);
+      const items = await getWasteItems(selectedDrug, dose, selectedMethod, selectedForm);
       setWasteItems(items);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load waste data');
