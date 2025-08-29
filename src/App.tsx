@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from "react";
 import { ChevronDown, Leaf, Pill, Droplet, LineChart, Loader } from "lucide-react";
 import { getWasteItems, getAvailableDrugs, type WasteItem, type DrugOption } from "./utils/wasteCalculator";
 import { Navbar } from "./Navbar";
+import { LandingPage } from "./LandingPage";
+import { EnvImpactCalculator } from "./EnvImpactCalculator";
 
 // Define types for regimen management
 interface Regimen {
@@ -18,7 +20,54 @@ interface Regimen {
 }
 
 export function App() {
-  const [activePage, setActivePage] = useState<"calculator" | "about">("calculator");
+  const [activePage, setActivePage] = useState<"landing" | "calculator" | "about" | "envImpact">("landing");
+
+  // Handle URL search params for direct linking and browser navigation
+  useEffect(() => {
+    const handleNavigation = () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const page = urlParams.get('page');
+      if (page === 'plasticWasteCalculator' || page === 'about' || page === 'envImpact' || page === 'home') {
+        if (page === 'plasticWasteCalculator') {
+          setActivePage('calculator');
+        } else if (page === 'envImpact') {
+          setActivePage('envImpact');
+        } else if (page === 'home') {
+          setActivePage('landing');
+        } else {
+          setActivePage(page);
+        }
+      } else {
+        setActivePage('landing');
+      }
+    };
+
+    // Handle initial load
+    handleNavigation();
+
+    // Handle browser back/forward navigation
+    window.addEventListener('popstate', handleNavigation);
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('popstate', handleNavigation);
+    };
+  }, []);
+
+  // Update URL when page changes
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    if (activePage === 'landing') {
+      url.searchParams.set('page', 'home');
+    } else if (activePage === 'calculator') {
+      url.searchParams.set('page', 'plasticWasteCalculator');
+    } else if (activePage === 'envImpact') {
+      url.searchParams.set('page', 'envImpact');
+    } else {
+      url.searchParams.set('page', activePage);
+    }
+    window.history.pushState({}, '', url.toString());
+  }, [activePage]);
 
   const [drugs, setDrugs] = useState<DrugOption[]>([]);
   const [selectedDrug, setSelectedDrug] = useState<string>("");
@@ -1012,6 +1061,15 @@ export function App() {
             )}
           </div>
         </main>
+      )}
+      {activePage === "landing" && (
+        <LandingPage 
+          onGetStarted={() => setActivePage("calculator")} 
+          onEnvImpact={() => setActivePage("envImpact")} 
+        />
+      )}
+      {activePage === "envImpact" && (
+        <EnvImpactCalculator onBackToHome={() => setActivePage("landing")} />
       )}
       {activePage === "about" && (
         <div className="max-w-2xl mx-auto py-10 px-4">
