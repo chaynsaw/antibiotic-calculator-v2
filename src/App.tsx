@@ -1064,8 +1064,10 @@ export function App() {
                 <span className="font-bold underline">Emily Spivak, MD:</span>
                 <span> Emily is a Professor of Medicine in the Division of Infectious Diseases at University of Utah School of Medicine. She serves as Medical Director of the Antimicrobial Stewardship Programs at University of Utah Health and the Salt Lake City Veterans Affairs Healthcare System. Dr. Spivak's research interests focus on understanding patterns and drivers of antimicrobial use, development and evaluation of methods to improve antimicrobial use. Dr. Spivak has developed an interest in the intersection of climate change and healthcare and led efforts to estimate greenhouse gas emissions from unnecessary antibiotic prescriptions and advocated for more sustainable practices with infectious diseases diagnosis and antimicrobial prescribing. She is a Fellow of the Infectious Diseases Society of America (IDSA) and a Fellow of the Society for Hospital Epidemiology of America.</span>
               </div>
+              <div>
                 <span className="font-bold underline">Leila Hojat, MD:</span>
                 <span> Leila is an Associate Professor of Medicine in the Division of Infectious Diseases at Emory University and Director of Antimicrobial Stewardship at Emory University Hospital Midtown. She serves on both the Antimicrobial Stewardship Committee and the Research Committee of the Society for Healthcare Epidemiology of America (SHEA) and has collaborated with multiple organizations to develop guidance on community-acquired pneumonia and to advance infectious diseases medical education. Her interests include clinical decision support and healthcare sustainability, and she endeavors to apply One Health principles across all aspects of clinical practice, research, and antimicrobial stewardship.</span>
+              </div>
             </div>
           </div>
 
