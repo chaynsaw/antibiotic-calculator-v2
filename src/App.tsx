@@ -1024,7 +1024,7 @@ export function App() {
           <h1 className="text-2xl font-bold text-center underline mb-8">OUR TEAM</h1>
           <div className="mb-6">
             <span className="font-bold underline">CONCEPTION / DESIGN:</span>
-            <span> Pam Lee, Hugh Gordon, Chaynor Hsiao, Gary Fong</span>
+            <span> Pam Lee, Hugh Gordon, Chaynor Hsiao, Gary Fong, Emily Spivak, Leila Hojat</span>
           </div>
           <div className="mb-6">
             <span className="font-bold underline">DATA COLLECTION:</span>
