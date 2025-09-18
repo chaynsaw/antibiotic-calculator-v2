@@ -21,7 +21,7 @@ export function Navbar({ active, onSelect }: NavbarProps) {
               </span>
             </button>
           </div>
-                    <div className="flex mt-4 md:mt-0 justify-center md:justify-end space-x-0 md:space-x-4">
+          <div className="flex mt-4 md:mt-0 justify-center md:justify-end space-x-0 md:space-x-4 md:ml-8">
             <button
               onClick={() => onSelect("calculator")}
               className={`px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
