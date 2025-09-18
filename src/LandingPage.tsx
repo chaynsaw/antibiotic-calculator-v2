@@ -1,4 +1,4 @@
-import { Leaf, Calculator, Users, ArrowRight, BarChart3 } from "lucide-react";
+import { Leaf, Calculator, Users, BarChart3 } from "lucide-react";
 
 interface LandingPageProps {
   onGetStarted: () => void;

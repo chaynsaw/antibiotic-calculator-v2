@@ -1,4 +1,4 @@
-import { BarChart3, ChevronDown } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 
 interface EnvImpactCalculatorProps {
@@ -16,7 +16,7 @@ interface EnvironmentalImpact {
   weightPerDOT: number;
 }
 
-export function EnvImpactCalculator({ onBackToHome }: EnvImpactCalculatorProps) {
+export function EnvImpactCalculator({ onBackToHome: _ }: EnvImpactCalculatorProps) {
   const [drugs, setDrugs] = useState<DrugOption[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedDrug, setSelectedDrug] = useState("");
