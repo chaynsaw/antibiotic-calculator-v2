@@ -35,7 +35,7 @@ export function EnvImpactCalculator({ onBackToHome: _ }: EnvImpactCalculatorProp
   useEffect(() => {
     const fetchDrugNames = async () => {
       try {
-        const response = await fetch('./data/env_impact_lookup_tables.csv');
+        const response = await fetch('/data/env_impact_lookup_tables.csv');
         const csvText = await response.text();
         
         // Parse CSV
