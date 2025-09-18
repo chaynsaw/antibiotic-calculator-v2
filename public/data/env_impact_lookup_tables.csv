@@ -1,0 +1,140 @@
+﻿"All Antimicrobial Agents
+List of all antimicrobial agents used in DOT Calculator",,,,,,,"All Drug Product Doses
+List of available antimicrobial agents and doses used in Drug Doses Calculator",,,,,,,,"All Drug Products
+Full list of available antimicrobial agents, doses, and formulations used in Drug Product Calculator ",,,,,,,,,Drug Frequency Conversions,,,Distance Comparisons,,,,Drug Doses per Day,
+Drug Product,Admin Method,Total CO2e per Dose,Total CO2e per DOT,Total Weight per Dose,Total Weight per DOT,,Drug Product,Admin Method,Dose,Total CO2e per Dose,Total CO2e per DOT,Total Weight per Dose,Total Weight per DOT,,Drug Product,Admin Method,Dose,Form,Total CO2e per Dose,Total CO2e per DOT,Total Weight per Dose,Total Weight per DOT,,Frequency,Conversion,,Distance Lower Range (miles),Distance Upper Range (miles),Comparable Distance,,Drug,Doses per Day
+Acyclovir,IV,0.0000103621198,0.0000310863593,0.115,0.346,,Acyclovir,IV,250 mg,0.0000085075686,0.0000255227057,0.091,0.273,,Acyclovir,IV,250 mg/ 50 mL,locally compounded,0.0000085075686,0.0000255227057,0.091,0.273,,Every 4 hours (q4h),6,,0,5,Average ride-share distance,,Acyclovir,3
+Amikacin,IV,0.0000093394867,0.0000280184602,0.098,0.295,,Acyclovir,IV,500 mg,0.0000086325537,0.0000258976612,0.097,0.290,,Acyclovir,IV,500 mg/ 100 mL,locally compounded,0.0000086325537,0.0000258976612,0.097,0.290,,Every 6 hours (q6h),4,,5,6,Height of Mount Everest ,,Amikacin,3
+Amphotericin B liposomal (Ambisome),IV,0.0001805256177,0.0001805256177,0.792,0.792,,Acyclovir,IV,750 mg,0.0000123770579,0.0000371311737,0.136,0.408,,Acyclovir,IV,750 mg/ 150 mL,locally compounded,0.0000123770579,0.0000371311737,0.136,0.408,,Every 8 hours (q8h),3,,6,6.3,10K race distance,,Amphotericin B liposomal (Ambisome),1
+Ampicillin,IV,0.0000072578110,0.0000435468662,0.089,0.531,,Acyclovir,IV,1000 mg,0.0000119312989,0.0000357938967,0.138,0.413,,Acyclovir,IV,1000 mg/ 150 mL,locally compounded,0.0000119312989,0.0000357938967,0.138,0.413,,Every 12 hours (q12h),2,,6.3,7,Empire State Building → Statue of Liberty,,Ampicillin,6
+Ampicillin-sulbactam,IV,0.0000089084922,0.0000356339690,0.092,0.367,,Amikacin,IV,1200 mg,0.0000093394867,0.0000280184602,0.098,0.295,,Amikacin,IV,1200 mg/ 100 mL,locally compounded,0.0000093394867,0.0000280184602,0.098,0.295,,Every 24 hours (q24h),1,,7,8,Yosemite Valley length,,Ampicillin-sulbactam,4
+Azithromycin,IV,0.0000147005147,0.0000147005147,0.195,0.195,,Amphotericin B liposomal (Ambisome) ,IV,480 mg,0.0001805256177,0.0001805256177,0.792,0.792,,Amphotericin B liposomal (Ambisome) ,IV,480 mg/ 250 mL,locally compounded,0.0001805256177,0.0001805256177,0.792,0.792,,Every 48 hours (q48h),0.5,,8,10,Average car trip distance,,Azithromycin,1
+Aztreonam,IV,0.0000097394859,0.0000292184578,0.111,0.332,,Ampicillin,IV,2 g,0.0000072578110,0.0000435468662,0.089,0.531,,Ampicillin,IV,2 g/ 100 mL,mini-bag plus,0.0000072578110,0.0000435468662,0.089,0.531,,,,,10,13,Manhatten → Brooklyn ,,Aztreonam,3
+Caspofungin,IV,0.0000157622917,0.0000157622917,0.211,0.211,,Ampicillin-sulbactam,IV,1.5 g,0.0000092893710,0.0000371574840,0.089,0.355,,Ampicillin-sulbactam,IV,1.5 g/ 50 mL,mini-bag plus,0.0000092893710,0.0000371574840,0.089,0.355,,,,,13,14,Manhattan length,,Caspofungin,1
+Cefazolin,IV,0.0000078172911,0.0000172825650,0.116,0.207,,Ampicillin-sulbactam,IV,3 g,0.0000085276135,0.0000341104540,0.094,0.378,,Ampicillin-sulbactam,IV,3 g/ 100 mL,mini-bag plus,0.0000085276135,0.0000341104540,0.094,0.378,,,,,14,16,"San Francisco, CA → Oakland, CA",,Cefazolin,3
+Cefepime,IV,0.0000098779515,0.0000296338545,0.086,0.258,,Azithromycin,IV,500 mg,0.0000147005147,0.0000147005147,0.195,0.195,,Azithromycin,IV,500 mg/ 250 mL,vial-mate,0.0000140497837,0.0000140497837,0.199,0.199,,,,,16,20,"Niagara Falls → Buffalo, NY",,Cefepime,3
+Cefiderocol,IV,0.0000124075925,0.0000372227775,0.116,0.347,,Aztreonam,IV,1 g,0.0000096238487,0.0000288715460,0.109,0.327,,Azithromycin,IV,500 mg/ 250 mL,locally compounded,0.0000153512457,0.0000153512457,0.192,0.192,,,,,20,22,English Channel swim distance,,Cefiderocol,3
+Cefoxitin,IV,0.0000098497571,0.0000393990285,0.118,0.471,,Aztreonam,IV,2 g,0.0000099707605,0.0000299122816,0.114,0.342,,Aztreonam,IV,1 g/ 50 mL,locally compounded,0.0000103523166,0.0000310569497,0.120,0.361,,,,,22,25,Grand Canyon Rim-to-Rim hike,,Cefoxitin,4
+Ceftaroline,IV,0.0000100525267,0.0000301575800,0.129,0.386,,Caspofungin,IV,70 mg,0.0000157622917,0.0000157622917,0.211,0.211,,Aztreonam,IV,1 g/ 100 mL,mini-bag plus,0.0000088953807,0.0000266861422,0.098,0.293,,,,,25,26,"Chicago, IL → O'Hare International Airport ",,Ceftaroline,3
+Ceftazidime,IV,0.0000132476073,0.0000397428219,0.153,0.460,,Cefazolin,IV,1 g,0.0000053291067,0.0000159873201,0.062,0.185,,Aztreonam,IV,2 g/ 100 mL,mini-bag plus,0.0000099707605,0.0000299122816,0.114,0.342,,,,,26,27,Marathon race distance,,Ceftazidime,3
+Ceftazidime-avibactam,IV,0.0000099874627,0.0000299623882,0.126,0.377,,Cefazolin,IV,2 g,0.0000088688042,0.0000266064125,0.076,0.228,,Caspofungin,IV,70 mg/ 250 mL,locally compounded,0.0000157622917,0.0000157622917,0.211,0.211,,,,,27,31,"San Francisco, CA → Palo Alto, CA",,Ceftazidime-avibactam,3
+Ceftolozane-tazobactam,IV,0.0000123411970,0.0000370235910,0.135,0.404,,Cefazolin,IV,3 g,0.0000092539624,0.0000092539624,0.209,0.209,,Cefazolin,IV,1 g/ 10 mL,locally compounded,0.0000029203918,0.0000087611755,0.066,0.198,,,,,31,35,Average Tour de France daily stage distance,,Ceftolozane-tazobactam,3
+Ceftriaxone,IV,0.0000110107340,0.0000110107340,0.172,0.172,,Cefepime,IV,1 g,0.0000084642692,0.0000253928075,0.084,0.253,,Cefazolin,IV,2 g/ 20 mL,locally compounded,0.0000043538734,0.0000130616203,0.087,0.262,,,,,35,38,"San Francisco, CA → Napa Valley",,Ceftriaxone,1
+Cefuroxime,IV,0.0000092487738,0.0000184975475,0.146,0.292,,Cefepime,IV,2 g,0.0000112916338,0.0000338749015,0.088,0.264,,Cefazolin,IV,3 g/ 30 mL,locally compounded,0.0000087611755,0.0000087611755,0.198,0.198,,,,,38,42,"Washington, D.C. → Dulles International Airport ",,Cefuroxime,2
+Ciprofloxacin,IV,0.0000145690920,0.0000291381840,0.094,0.189,,Cefiderocol,IV,1000 mg,0.0000103345927,0.0000310037782,0.120,0.359,,Cefazolin,IV,1 g/ 50 mL,frozen premix,0.0000077378216,0.0000232134647,0.057,0.172,,,,,42,46,"Los Angeles, CA → Anaheim, CA",,Ciprofloxacin,2
+Clindamycin,IV,0.0000077047616,0.0000231142847,0.056,0.167,,Cefiderocol,IV,2000 mg,0.0000144805922,0.0000434417767,0.112,0.336,,Cefazolin,IV,2 g/ 100 mL,frozen premix,0.0000133837349,0.0000401512047,0.064,0.193,,,,,46,50,"Boston, MA → Providence, RI",,Clindamycin,3
+Colistimethate,IV,0.0000125178109,0.0000250356217,0.140,0.279,,Cefoxitin,IV,1000 mg,0.0000103089850,0.0000412359400,0.124,0.497,,Cefazolin,IV,3 g/ 100 mL,locally compounded,0.0000097467492,0.0000097467492,0.221,0.221,,,,,50,52,"Torres del Paine W Circuit, Chile",,Colistimethate,2
+Daptomycin,IV,0.0000206897010,0.0000206897010,0.239,0.239,,Cefoxitin,IV,2000 mg,0.0000096201432,0.0000384805727,0.115,0.459,,Cefepime,IV,1 g/ 100 mL,mini-bag plus,0.0000091907167,0.0000275721502,0.111,0.334,,,,,52,55,Great Smoky Mountains length,,Daptomycin,1
+Doxycycline,IV,0.0000101100442,0.0000202200883,0.133,0.265,,Ceftaroline,IV,600 mg,0.0000100525267,0.0000301575800,0.129,0.386,,Cefepime,IV,2 g/ 100 mL,mini-bag plus,0.0000091995327,0.0000275985982,0.112,0.335,,,,,55,60,"New York City → New Haven, CT",,Doxycycline,2
+Ertapenem,IV,0.0000110432120,0.0000110432120,0.206,0.206,,Ceftazidime,IV,1000 mg,0.0000137332526,0.0000411997577,0.161,0.482,,Cefepime,IV,1 g/ 50 mL,frozen premix,0.0000077378216,0.0000232134647,0.057,0.172,,,,,60,70,African savannah elephant seasonal range,,Ertapenem,1
+Erythromycin,IV,0.0000077879580,0.0000311518319,0.103,0.412,,Ceftazidime,IV,2000 mg,0.0000130047847,0.0000390143540,0.149,0.448,,Cefepime,IV,2 g/ 100 mL,frozen premix,0.0000133837349,0.0000401512047,0.064,0.193,,,,,70,80,"London, UK → Oxford, UK",,Erythromycin,4
+Fluconazole,IV,0.0000460988089,0.0000460988089,0.188,0.188,,Ceftazidime-avibactam,IV,2.5 g,0.0000099874627,0.0000299623882,0.126,0.377,,Cefiderocol,IV,1000 mg/ 100 mL,locally compounded,0.0000103345927,0.0000310037782,0.120,0.359,,,,,80,81,"New Orleans, LA → Baton Rouge, LA",,Fluconazole,1
+Ganciclovir,IV,0.0000120323799,0.0000240647597,0.131,0.261,,Ceftolozane-tazobactam,IV,1.5 g,0.0000099841567,0.0000299524702,0.125,0.376,,Cefiderocol,IV,2000 mg/ 100 mL,locally compounded,0.0000144805922,0.0000434417767,0.112,0.336,,,,,81,82,Mount Everest Base Camp Trek 81,,Ganciclovir,2
+Gentamicin,IV,0.0000083082351,0.0000249247054,0.121,0.364,,Ceftolozane-tazobactam,IV,3 g,0.0000170552775,0.0000511658325,0.153,0.458,,Cefoxitin,IV,1000 mg/ 50 mL,locally compounded,0.0000103089850,0.0000412359400,0.124,0.497,,,,,82,90,"Philadelphia, PA → Newark, NJ",,Gentamicin,3
+Imipenem-cilastatin,IV,0.0000208288607,0.0000833154427,0.199,0.797,,Ceftriaxone,IV,1 g,0.0000113223796,0.0000113223796,0.168,0.168,,Cefoxitin,IV,2000 mg/ 100 mL,locally compounded,0.0000103728092,0.0000414912367,0.127,0.508,,,,,90,105,"New York City → Philadelphia, PA",,Imipenem-cilastatin,4
+Isavuconazonium,IV,0.0000372358637,0.0000372358637,0.226,0.226,,Ceftriaxone,IV,2 g,0.0000106990884,0.0000106990884,0.176,0.176,,Cefoxitin,IV,2000 mg/ 100 mL,mini-bag plus,0.0000088674772,0.0000354699087,0.102,0.409,,,,,105,115,Puerto Rico east/west length,,Isavuconazonium,1
+Levofloxacin,IV,0.0000250961215,0.0000250961215,0.170,0.170,,Cefuroxime,IV,750 mg,0.0000096857168,0.0000193714335,0.144,0.288,,Ceftaroline,IV,600 mg/ 50 mL,locally compounded,0.0000108790726,0.0000326372177,0.144,0.433,,,,,115,135,"Los Angeles, CA → San Diego, CA",,Levofloxacin,1
+Linezolid,IV,0.0000539719102,0.0001079438203,0.138,0.277,,Cefuroxime,IV,1500 mg,0.0000088118308,0.0000176236615,0.148,0.295,,Ceftaroline,IV,600 mg/ 100 mL,mini-bag plus,0.0000092259807,0.0000276779422,0.113,0.338,,,,,135,140,Death Valley length,,Linezolid,2
+Meropenem,IV,0.0000103238861,0.0000309716583,0.148,0.444,,Ciprofloxacin,IV,400 mg,0.0000145690920,0.0000291381840,0.094,0.189,,Ceftazidime,IV,1000 mg/ 50 mL,locally compounded,0.0000137332526,0.0000411997577,0.161,0.482,,,,,140,165,Washington D.C. → Philadelphia,,Meropenem,3
+Meropenem-vaborbactam,IV,0.0000204385552,0.0000613156657,0.274,0.821,,Clindamycin,IV,300 mg,0.0000077047616,0.0000231142847,0.056,0.167,,Ceftazidime,IV,2000 mg/ 50 mL,locally compounded,0.0000137332526,0.0000411997577,0.161,0.482,,,,,165,185,"Atlanta, GA → Chattanooga, TN",,Meropenem-vaborbactam,3
+Metronidazole,IV,0.0000222528513,0.0000667585539,0.087,0.261,,Clindamycin,IV,600 mg,0.0000077047616,0.0000231142847,0.056,0.167,,Ceftazidime,IV,2000 mg/ 100 mL,mini-bag plus,0.0000122763167,0.0000368289502,0.138,0.414,,,,,185,200,"Washington, D.C. → Cleveland, OH",,Metronidazole,3
+Micafungin,IV,0.0000082270912,0.0000082270912,0.195,0.195,,Clindamycin,IV,900 mg,0.0000077047616,0.0000231142847,0.056,0.167,,Ceftazidime-avibactam,IV,2.5 g/ 100 mL,locally compounded,0.0000107401287,0.0000322203862,0.138,0.414,,,,,200,210,"Chicago, IL → Indianapolis, IN",,Micafungin,1
+Minocycline,IV,0.0000083048649,0.0000166097297,0.131,0.263,,Colistimethate,IV,150 mg,0.0000125178109,0.0000250356217,0.140,0.279,,Ceftazidime-avibactam,IV,2.5 g/ 100 mL,mini-bag plus,0.0000092347967,0.0000277043902,0.113,0.340,,,,,210,215,London → Paris,,Minocycline,2
+Nafcillin,IV,0.0000093334533,0.0000560007197,0.054,0.325,,Daptomycin,IV,500 mg,0.0000177038320,0.0000177038320,0.223,0.223,,Ceftolozane-tazobactam,IV,1.5 g/ 100 mL,locally compounded,0.0000107368227,0.0000322104682,0.138,0.414,,,,,215,225,"New York City → Boston, MA",,Nafcillin,6
+Penicillin,IV,0.0000069943665,0.0000419661987,0.035,0.210,,Daptomycin,IV,750 mg,0.0000236755700,0.0000236755700,0.255,0.255,,Ceftolozane-tazobactam,IV,1.5 g/ 100 mL,mini-bag plus,0.0000092314907,0.0000276944722,0.113,0.339,,,,,225,260,"New York City → Washington, D.C.",,Penicillin,6
+Pentamidine,IV,0.0000149881367,0.0000149881367,0.176,0.176,,Doxycycline,IV,100 mg,0.0000101100442,0.0000202200883,0.133,0.265,,Ceftolozane-tazobactam,IV,3 g/ 100 mL,locally compounded,0.0000170552775,0.0000511658325,0.153,0.458,,,,,260,275,Grand Canyon length,,Pentamidine,1
+Piperacillin-tazobactam,IV,0.0000092480651,0.0000369922605,0.048,0.194,,Ertapenem,IV,500 mg,0.0000119067610,0.0000119067610,0.212,0.212,,Ceftriaxone,IV,1 g/ 100 mL,mini-bag plus,0.0000119331172,0.0000119331172,0.190,0.190,,,,,275,300,"Chicago, IL → Indianapolis, IN",,Piperacillin-tazobactam,4
+Posaconazole,IV,0.0000149209606,0.0000149209606,0.227,0.227,,Ertapenem,IV,1 g,0.0000101796630,0.0000101796630,0.199,0.199,,Ceftriaxone,IV,2 g/ 100 mL,mini-bag plus,0.0000106865348,0.0000106865348,0.206,0.206,,,,,300,350,"Chicago, IL → St. Louis, MO",,Posaconazole,1
+Remdesivir,IV,0.0000421235092,0.0000421235092,0.271,0.271,,Erythromycin,IV,500 mg,0.0000077879580,0.0000311518319,0.103,0.412,,Ceftriaxone,IV,1 g/ 50 mL,frozen premix,0.0000107116420,0.0000107116420,0.146,0.146,,,,,350,375,"New York City → Pittsburgh, PA",,Remdesivir,1
+Rifampin,IV,0.0000179195210,0.0000537585630,0.131,0.393,,Fluconazole,IV,200 mg,0.0000217802035,0.0000217802035,0.162,0.162,,Ceftriaxone,IV,2 g/ 50 mL,frozen premix,0.0000107116420,0.0000107116420,0.146,0.146,,,,,375,400,"Los Angeles, CA → San Francisco, CA",,Rifampin,3
+Sulfamethoxazole-trimethoprim,IV,0.0000162990759,0.0000488972277,0.151,0.453,,Fluconazole,IV,400 mg,0.0000704174143,0.0000704174143,0.213,0.213,,Cefuroxime,IV,750 mg/ 100 mL,mini-bag plus,0.0000097666679,0.0000195333357,0.126,0.252,,,,,400,420,"Denver, CO → Kansas City, MO",,Sulfamethoxazole-trimethoprim,3
+Tigecycline,IV,0.0000088219784,0.0000176439567,0.125,0.251,,Ganciclovir,IV,225 mg,0.0000120323799,0.0000240647597,0.131,0.261,,Cefuroxime,IV,750 mg/ 50 mL,locally compounded,0.0000096047657,0.0000192095314,0.162,0.324,,,,,420,430,"San Francisco, CA → Portland, OR ",,Tigecycline,2
+Vancomycin,IV,0.0000128240743,0.0000256481485,0.141,0.282,,Gentamicin,IV,400 mg,0.0000083082351,0.0000249247054,0.121,0.364,,Cefuroxime,IV,1500 mg/ 50 mL,locally compounded,0.0000096246017,0.0000192492034,0.163,0.326,,,,,430,450,"Dallas, TX → New Orleans, LA",,Vancomycin,2
+,,,,,,,Imipenem-cilastatin,IV,1000 mg,0.0000208288607,0.0000833154427,0.199,0.797,,Cefuroxime,IV,1500 mg/ 100 mL,mini-bag plus,0.0000079990599,0.0000159981197,0.133,0.265,,,,,450,500,"Rome, Italy → Vienna, Austria",,,
+,,,,,,,Isavuconazonium,IV,372 mg,0.0000372358637,0.0000372358637,0.226,0.226,,Ciprofloxacin,IV,400 mg/ 200 mL,premix,0.0000145690920,0.0000291381840,0.094,0.189,,,,,500,540,"Paris, France → Berlin, Germany",,,
+,,,,,,,Levofloxacin,IV,250 mg,0.0000250682042,0.0000250682042,0.169,0.169,,Clindamycin,IV,300 mg/ 50 mL,premix,0.0000077047616,0.0000231142847,0.056,0.167,,,,,540,550,Spain north/south length,,,
+,,,,,,,Levofloxacin,IV,500 mg,0.0000250673226,0.0000250673226,0.169,0.169,,Clindamycin,IV,600 mg/ 50 mL,premix,0.0000077047616,0.0000231142847,0.056,0.167,,,,,550,600,Mainland France north/south length,,,
+,,,,,,,Levofloxacin,IV,750 mg,0.0000251528378,0.0000251528378,0.172,0.172,,Clindamycin,IV,900 mg/ 50 mL,premix,0.0000077047616,0.0000231142847,0.056,0.167,,,,,600,620,Denali National Park perimeter ,,,
+,,,,,,,Linezolid,IV,600 mg,0.0000539719102,0.0001079438203,0.138,0.277,,Colistimethate,IV,150 mg/ 100 mL,locally compounded,0.0000125178109,0.0000250356217,0.140,0.279,,,,,620,650,"New York City → Detroit, MI",,,
+,,,,,,,Meropenem,IV,500 mg,0.0000080568620,0.0000241705861,0.111,0.333,,Daptomycin,IV,500 mg/ 50 mL,locally compounded,0.0000177038320,0.0000177038320,0.223,0.223,,,,,650,670,"Atlanta, GA → Dallas, TX",,,
+,,,,,,,Meropenem,IV,1 g,0.0000086948649,0.0000260845948,0.118,0.354,,Daptomycin,IV,750 mg/ 50 mL,locally compounded,0.0000236755700,0.0000236755700,0.255,0.255,,,,,670,690,"Seattle, WA → San Francisco, CA",,,
+,,,,,,,Meropenem,IV,2 g,0.0000122719087,0.0000368157262,0.181,0.544,,Doxycycline,IV,100 mg/ 250 mL,locally compounded,0.0000111513309,0.0000223026617,0.136,0.273,,,,,690,710,"Chicago, IL → Washington, D.C.",,,
+,,,,,,,Meropenem-vaborbactam,IV,4 g,0.0000204385552,0.0000613156657,0.274,0.821,,Doxycycline,IV,100 mg/ 100 mL,mini-bag plus,0.0000090687575,0.0000181375150,0.129,0.258,,,,,710,730,"New York City → Chicago, IL",,,
+,,,,,,,Metronidazole,IV,500 mg,0.0000222528513,0.0000667585539,0.087,0.261,,Ertapenem,IV,500 mg/ 50 mL,locally compounded,0.0000119067610,0.0000119067610,0.212,0.212,,,,,730,750,"Washington, D.C. → St. Louis, MO",,,
+,,,,,,,Micafungin,IV,100 mg,0.0000082270912,0.0000082270912,0.195,0.195,,Ertapenem,IV,1 g/ 50 mL,mini-bag plus,0.0000101796630,0.0000101796630,0.199,0.199,,,,,750,775,"Madrid, Spain → Paris, France",,,
+,,,,,,,Minocycline,IV,100 mg,0.0000070264071,0.0000140528142,0.123,0.247,,Erythromycin,IV,500 mg/ 100 mL,locally compounded,0.0000077879580,0.0000311518319,0.103,0.412,,,,,775,790,"Denver, CO → Dallas, TX",,,
+,,,,,,,Minocycline,IV,200 mg,0.0000108617804,0.0000217235607,0.147,0.294,,Fluconazole,IV,200 mg/ 100 mL,premix,0.0000217802035,0.0000217802035,0.162,0.162,,,,,790,810,"London, UK → Prague, Czech Republic",,,
+,,,,,,,Nafcillin,IV,2 g,0.0000105029967,0.0000630179802,0.064,0.382,,Fluconazole,IV,400 mg/ 200 mL,premix,0.0000704174143,0.0000704174143,0.213,0.213,,,,,810,840,California coastline length,,,
+,,,,,,,Nafcillin,IV,1 g,0.0000069943665,0.0000419661987,0.035,0.210,,Ganciclovir,IV,225 mg/ 100 mL,locally compounded,0.0000120323799,0.0000240647597,0.131,0.261,,,,,840,880,"Rome, Italy → Berlin, Germany",,,
+,,,,,,,Penicillin G ,IV,3 million units,0.0000069943665,0.0000419661987,0.035,0.210,,Gentamicin,IV,400 mg/ 100 mL,locally compounded,0.0000083082351,0.0000249247054,0.121,0.364,,,,,880,900,"Minneaoplis, MN → Denver, CO",,,
+,,,,,,,Pentamidine,IV,300 mg,0.0000149881367,0.0000149881367,0.176,0.176,,Imipenem-cilastatin,IV,1000 mg/ 250 mL,locally compounded,0.0000208288607,0.0000833154427,0.199,0.797,,,,,900,930,"Chicago, IL → Dallas, TX",,,
+,,,,,,,Piperacillin-tazobactam,IV,2.25 g,0.0000073660940,0.0000294643760,0.046,0.184,,Isavuconazonium,IV,372 mg/ 250 mL,locally compounded,0.0000372358637,0.0000372358637,0.226,0.226,,,,,930,950,"Paris, France → Warsaw, Poland",,,
+,,,,,,,Piperacillin-tazobactam,IV,3.375 g,0.0000073660940,0.0000294643760,0.046,0.184,,Levofloxacin,IV,250 mg/ 50 mL,premix,0.0000250682042,0.0000250682042,0.169,0.169,,,,,950,975,"Seattle, WA → San Francisco, CA",,,
+,,,,,,,Piperacillin-tazobactam,IV,4.5 g,0.0000130120073,0.0000520480294,0.053,0.213,,Levofloxacin,IV,500 mg/ 100 mL,premix,0.0000250673226,0.0000250673226,0.169,0.169,,,,,975,990,"New York City → Orlando, FL ",,,
+,,,,,,,Posaconazole,IV,300 mg,0.0000149209606,0.0000149209606,0.227,0.227,,Levofloxacin,IV,750 mg/ 150 mL,premix,0.0000251528378,0.0000251528378,0.172,0.172,,,,,990,1010,"Boston, MA → St. Louis, MO",,,
+,,,,,,,Remdesivir,IV,100 mg,0.0000330809105,0.0000330809105,0.244,0.244,,Linezolid,IV,600 mg/ 300 mL,premix,0.0000539719102,0.0001079438203,0.138,0.277,,,,,1010,1050,"Cairo, Egypt  → Athens, Greece",,,
+,,,,,,,Remdesivir,IV,200 mg,0.0000602087067,0.0000602087067,0.325,0.325,,Meropenem,IV,500 mg/ 100 mL,mini-bag plus,0.0000080568620,0.0000241705861,0.111,0.333,,,,,1050,1200,"Miami, FL → Washington, D.C.",,,
+,,,,,,,Rifampin,IV,600 mg,0.0000179195210,0.0000537585630,0.131,0.393,,Meropenem,IV,1 g/ 100 mL,mini-bag plus,0.0000086948649,0.0000260845948,0.118,0.354,,,,,1200,1350,"Dallas, TX → Washington, D.C.",,,
+,,,,,,,Sulfamethoxazole-trimethoprim,IV,2000 mg-400 mg,0.0000162990759,0.0000488972277,0.151,0.453,,Meropenem,IV,2 g/ 100 mL,locally compounded,0.0000148197327,0.0000444591982,0.227,0.682,,,,,1350,1550,"Houston, TX → Los Angeles, CA",,,
+,,,,,,,Tigecycline,IV,50 mg,0.0000088219784,0.0000176439567,0.125,0.251,,Meropenem,IV,2 g/ 100 mL,mini-bag plus,0.0000097240847,0.0000291722542,0.135,0.406,,,,,1550,1700,"Minneapolis, MN → Los Angeles, CA",,,
+,,,,,,,Vancomycin,IV,500 mg,0.0000133085877,0.0000266171754,0.092,0.184,,Meropenem-vaborbactam,IV,4 g/ 250 mL,locally compounded,0.0000204385552,0.0000613156657,0.274,0.821,,,,,1700,1800,"Chicago, IL → Phoenix, AZ",,,
+,,,,,,,Vancomycin,IV,750 mg,0.0000151349054,0.0000302698109,0.108,0.216,,Metronidazole,IV,500 mg/ 100 mL,premix,0.0000222528513,0.0000667585539,0.087,0.261,,,,,1800,1950,"New York City → Denver, CO",,,
+,,,,,,,Vancomycin,IV,1 g,0.0000150523190,0.0000301046380,0.110,0.220,,Micafungin,IV,100 mg/ 100 mL,locally compounded,0.0000082270912,0.0000082270912,0.195,0.195,,,,,1950,2050,India north/south length,,,
+,,,,,,,Vancomycin,IV,1250 mg,0.0000107599142,0.0000215198285,0.164,0.328,,Minocycline,IV,100 mg/ 100 mL,mini-bag plus,0.0000063052859,0.0000126105717,0.112,0.225,,,,,2050,2100,Moon diameter,,,
+,,,,,,,Vancomycin,IV,1500 mg,0.0000111355618,0.0000222711235,0.175,0.351,,Minocycline,IV,100 mg/ 250 mL,locally compounded,0.0000077475284,0.0000154950567,0.134,0.268,,,,,2100,2200,Appalachian Trail length,,,
+,,,,,,,Vancomycin,IV,1750 mg,0.0000119639640,0.0000239279280,0.182,0.365,,Minocycline,IV,200 mg/ 250 mL,locally compounded,0.0000108617804,0.0000217235607,0.147,0.294,,,,,2200,2300,"Seattle, WA → Houston, TX",,,
+,,,,,,,Vancomycin,IV,2000 mg,0.0000124132678,0.0000248265356,0.156,0.312,,Nafcillin,IV,2 g/ 100 mL,mini-bag plus,0.0000083657136,0.0000501942817,0.085,0.512,,,,,2300,2400,Mississippi River length,,,
+,,,,,,,,,,,,,,,Nafcillin,IV,1 g/ 50 mL,frozen premix,0.0000069943665,0.0000419661987,0.035,0.210,,,,,2400,2490,"Miami, FL → Denver, CO",,,
+,,,,,,,,,,,,,,,Nafcillin,IV,2 g/ 100 mL,frozen premix,0.0000126402798,0.0000758416787,0.042,0.252,,,,,2490,2600,Monarch Butterfly migration,,,
+,,,,,,,,,,,,,,,Penicillin G,IV,3 million units/ 50 mL,frozen premix,0.0000069943665,0.0000419661987,0.035,0.210,,,,,2600,2700,"New York City → Salt Lake City, UT",,,
+,,,,,,,,,,,,,,,Pentamidine,IV,300 mg/ 250 mL,locally compounded,0.0000149881367,0.0000149881367,0.176,0.176,,,,,2700,2800,Pacific Crest Trail length,,,
+,,,,,,,,,,,,,,,Piperacillin-tazobactam,IV,2.25 g/ 50 mL,frozen premix,0.0000073660940,0.0000294643760,0.046,0.184,,,,,2800,3000,"New York City → Los Angeles, CA",,,
+,,,,,,,,,,,,,,,Piperacillin-tazobactam,IV,3.375 g/ 50 mL,frozen premix,0.0000073660940,0.0000294643760,0.046,0.184,,,,,3000,3100,Rocky Mountain Range length,,,
+,,,,,,,,,,,,,,,Piperacillin-tazobactam,IV,4.5 g/ 100 mL,frozen premix,0.0000130120073,0.0000520480294,0.053,0.213,,,,,3100,3200,"Boston, MA → San Francisco, CA ",,,
+,,,,,,,,,,,,,,,Posaconazole,IV,300 mg/ 250 mL,locally compounded,0.0000149209606,0.0000149209606,0.227,0.227,,,,,3200,3300,"Miami, FL → Seattle, WA",,,
+,,,,,,,,,,,,,,,Remdesivir,IV,100 mg/ 250 mL,locally compounded,0.0000351751237,0.0000351751237,0.274,0.274,,,,,3300,3500,"New York City → London, UK",,,
+,,,,,,,,,,,,,,,Remdesivir,IV,100 mg/ 100 mL,mini-bag plus,0.0000309866972,0.0000309866972,0.214,0.214,,,,,3500,3700,"New York City → Bogotá, Colombia",,,
+,,,,,,,,,,,,,,,Remdesivir,IV,200 mg/ 250 mL,locally compounded,0.0000602087067,0.0000602087067,0.325,0.325,,,,,3700,3900,"Los Angeles, CA → Honolulu, HI ",,,
+,,,,,,,,,,,,,,,Rifampin,IV,600 mg/ 250 mL,locally compounded,0.0000179195210,0.0000537585630,0.131,0.393,,,,,3900,4000,"Chicago, IL → London, UK",,,
+,,,,,,,,,,,,,,,Sulfamethoxazole-trimethoprim,IV,2000 mg-400 mg/ 500,locally compounded,0.0000162990759,0.0000488972277,0.151,0.453,,,,,4000,4100,Nile River length,,,
+,,,,,,,,,,,,,,,Tigecycline,IV,50 mg/ 100 mL,locally compounded,0.0000094958514,0.0000189917027,0.134,0.268,,,,,4100,4200,"New York City → Lima, Peru",,,
+,,,,,,,,,,,,,,,Tigecycline,IV,50 mg/ 100 mL,mini-bag plus,0.0000081481054,0.0000162962107,0.117,0.233,,,,,4200,4400,Amazon River length,,,
+,,,,,,,,,,,,,,,Vancomycin,IV,500 mg/ 250 mL,locally compounded,0.0000124899854,0.0000249799707,0.097,0.194,,,,,4400,4700,"Washington, D.C. → London, UK",,,
+,,,,,,,,,,,,,,,Vancomycin,IV,750 mg/ 250 mL,locally compounded,0.0000048992822,0.0000097985644,0.117,0.235,,,,,4700,4900,"Miami, FL → Paris, France",,,
+,,,,,,,,,,,,,,,Vancomycin,IV,1 g/ 250 mL,locally compounded,0.0000052826850,0.0000105653699,0.125,0.249,,,,,4900,5000,Humpback whale migration,,,
+,,,,,,,,,,,,,,,Vancomycin,IV,500 mg/ 100 mL,frozen premix,0.0000141271900,0.0000282543800,0.086,0.173,,,,,5000,5200,"San Francisco, CA → Tokyo, Japan",,,
+,,,,,,,,,,,,,,,Vancomycin,IV,750 mg/ 150 mL,frozen premix,0.0000253705287,0.0000507410574,0.098,0.197,,,,,5200,5500,"New York City → Cairo, Egypt",,,
+,,,,,,,,,,,,,,,Vancomycin,IV,1 g/ 200 mL,frozen premix,0.0000248219531,0.0000496439062,0.095,0.191,,,,,5500,5700,Russia east/west length,,,
+,,,,,,,,,,,,,,,Vancomycin,IV,1250 mg/ 250 mL,locally compounded,0.0000147331064,0.0000294662127,0.199,0.398,,,,,5700,5900,"Los Angeles, CA → London, UK",,,
+,,,,,,,,,,,,,,,Vancomycin,IV,1250 mg/ 250 mL,locally compounded,0.0000067867221,0.0000135734442,0.129,0.259,,,,,5900,6100,"New York City → Tehran, Iran",,,
+,,,,,,,,,,,,,,,Vancomycin,IV,1500 mg/ 250 mL,locally compounded,0.0000071455215,0.0000142910430,0.134,0.269,,,,,6100,6200,"London, UK → Beijing, China",,,
+,,,,,,,,,,,,,,,Vancomycin,IV,1500 mg/ 500 mL,locally compounded,0.0000151256020,0.0000302512040,0.217,0.433,,,,,6200,6400,"San Francisco → Sydney, Australia",,,
+,,,,,,,,,,,,,,,Vancomycin,IV,1750 mg/ 250 mL,locally compounded,0.0000077873840,0.0000155747680,0.141,0.282,,,,,6400,6600,"Paris, France → Bangkok, Thailand",,,
+,,,,,,,,,,,,,,,Vancomycin,IV,1750 mg/ 500 mL,locally compounded,0.0000161405440,0.0000322810880,0.224,0.447,,,,,6600,6800,"New York City → Johannesburg, South Africa",,,
+,,,,,,,,,,,,,,,Vancomycin,IV,2000 mg/ 250 mL,locally compounded,0.0000086859916,0.0000173719831,0.151,0.301,,,,,6800,7000,"New York City → Tokyo, Japan",,,
+,,,,,,,,,,,,,,,Vancomycin,IV,2000 mg/ 500 mL,locally compounded,0.0000161405440,0.0000322810880,0.161,0.323,,,,,7000,7100,"London, UK → Cape Town, South Africa",,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,7100,7300,"London, UK → Bangkok, Thailand",,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,7300,7400,Los Angeles → Hong Kong,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,7400,7500,"Washington, D.C. → Nairobi, Kenya",,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,7500,7800,"London, UK → Singapore",,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,7800,7900,"Los Angeles, CA → Sydney, Australia",,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,7900,8000,"New York City → Manila, Philippines",,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,8000,8200,New York City → Hong Kong,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,8200,8400,"Los Angeles, CA → Dubai, UAE",,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,8400,8500,"Paris, France → Santiago, Chile",,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,8500,8700,"Paris, France → Buenos Aires, Argentina",,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,8700,9000,"New York City → Jakarta, Indonesia",,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,9000,9300,"New York City → Manila, Philippines",,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,9300,9400,"Washington, D.C. → Sydney, Australia",,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,9400,9500,"San Francisco → Cape Town, South Africa",,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,9500,9700,"London, UK → Santiago, Chile",,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,9700,10000,"Los Angeles, CA → Singapore",,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,10000,11000,"London, UK → Sydney, Australia",,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,11000,12000,"New York City → Perth, Australia",,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,12000,13000,"Madrid, Spain → Auckland, New Zealand",,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,13000,14000,Great Wall of China length,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,14000,15000,Jupiter Great Red Spot diameter,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,15000,17000,"New York City → Perth, Australia long-haul flight path",,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,17000,18000,Uranus circumference,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,18000,22000,Geostationary orbit altitude,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,22000,25000,Earth circumference,,,

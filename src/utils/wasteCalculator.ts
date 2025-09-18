@@ -30,7 +30,7 @@ interface WeightData {
 
 async function loadWeights(): Promise<WeightData> {
   try {
-    const response = await fetch('/data/weights-and-notes.csv');
+    const response = await fetch('./data/weights-and-notes.csv');
     const csvText = await response.text();
     
     const rows = csvText.split('\n').map(row => 
@@ -55,7 +55,7 @@ async function loadWeights(): Promise<WeightData> {
 
 export async function getAvailableDrugs(): Promise<DrugOption[]> {
   try {
-    const response = await fetch('/data/abx-waste-master-list.csv');
+    const response = await fetch('./data/abx-waste-master-list.csv');
     const csvText = await response.text();
     
     const rows = csvText.split('\n').map(row => 
@@ -235,7 +235,7 @@ export async function getWasteItems(drug: string, dose: string | number, method:
   try {
     // Load both data sources
     const [response, weights] = await Promise.all([
-      fetch('/data/abx-waste-master-list.csv'),
+      fetch('./data/abx-waste-master-list.csv'),
       loadWeights()
     ]);
     
