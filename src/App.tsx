@@ -595,7 +595,7 @@ export function App() {
             <header className="pt-8 pb-4">
               <div className="flex items-center space-x-2 mb-2">
                 <h1 className="text-4xl font-bold tracking-tight">
-                  Calculator
+                  Plastic Waste Calculator
                 </h1>
               </div>
               <p className="text-slate-300 text-lg max-w-4xl">

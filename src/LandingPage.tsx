@@ -37,7 +37,7 @@ export function LandingPage({ onGetStarted, onEnvImpact }: LandingPageProps) {
               </div>
               <span className="text-center leading-tight">
                 Compare two or more<br />
-                antimicrobial regimens<br />
+                antibiotic regimens<br />
                 to see which make the least<br />
                 plastic waste
               </span>
