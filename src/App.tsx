@@ -1132,6 +1132,10 @@ export function App() {
           <div className="mt-8 text-center">
             <span className="font-bold">Questions or Feedback?</span> Reach out to <a href="mailto:hello@ecorxchoice.com" className="underline text-blue-400 hover:text-blue-600">hello@ecorxchoice.com</a>
           </div>
+          
+          <div className="mt-6 text-center text-slate-400 text-sm">
+            This work partially funded by the Society of Infectious Diseases Educational Grant.
+          </div>
         </div>
       )}
       <footer className="py-4 px-6 text-center text-sm text-slate-400">
