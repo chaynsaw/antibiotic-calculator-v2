@@ -290,12 +290,10 @@ export function EnvImpactCalculator({ onBackToHome: _ }: EnvImpactCalculatorProp
                           setHighlightedIndex(0);
                         }}
                         onBlur={() => {
-                          // On blur, auto-select the topmost filtered option if not already selected
-                          if (filteredDrugs.length > 0 && filteredDrugs[highlightedIndex] && selectedDrug !== filteredDrugs[highlightedIndex]?.name) {
-                            const drug = filteredDrugs[highlightedIndex];
-                            setSelectedDrug(drug.name);
-                            setSearchTerm(drug.name);
-                          }
+                          // Add small delay to allow click events to process first
+                          setTimeout(() => {
+                            setIsDropdownOpen(false);
+                          }, 150);
                         }}
                         onKeyDown={(e) => {
                           if (e.key === "ArrowDown") {
