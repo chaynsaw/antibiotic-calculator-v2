@@ -216,6 +216,13 @@ export function EnvImpactCalculator({ onBackToHome: _ }: EnvImpactCalculatorProp
   // Load forms when dose changes (but not when auto-selecting from form)
   useEffect(() => {
     if (selectedDrug && csvData.length > 0 && !isAutoSelectingDose.current) {
+      // If dose is emptied, clear the form as well
+      if (!selectedDose || selectedDose.trim() === '') {
+        setSelectedForm("");
+        loadAvailableForms(selectedDrug, selectedDose);
+        return;
+      }
+      
       // If there's an existing form selection, check if it's compatible with the new dose
       if (selectedForm && selectedForm.trim() !== '') {
         // Check if the current form is compatible with the new dose
@@ -489,7 +496,7 @@ export function EnvImpactCalculator({ onBackToHome: _ }: EnvImpactCalculatorProp
                 
                 <div className="relative">
                   <label className="block text-sm font-medium text-slate-300 mb-1">
-                    Form
+                    Form (optional)
                   </label>
                   <div className="relative">
                     <select
