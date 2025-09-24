@@ -1134,7 +1134,7 @@ export function App() {
           </div>
           
           <div className="mt-6 text-center text-slate-400 text-sm">
-            This work partially funded by the Society of Infectious Diseases Educational Grant.
+          This work was partially funded by the Society of Infectious Diseases Pharmacists (SIDP) Educational Grant
           </div>
         </div>
       )}
