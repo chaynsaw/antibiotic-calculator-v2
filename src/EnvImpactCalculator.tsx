@@ -30,6 +30,7 @@ export function EnvImpactCalculator({ onBackToHome: _ }: EnvImpactCalculatorProp
   const [environmentalImpact, setEnvironmentalImpact] = useState<EnvironmentalImpact | null>(null);
   const [csvData, setCsvData] = useState<string[][]>([]);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const isAutoSelectingDose = useRef<boolean>(false);
 
   // Load drug names from CSV
   useEffect(() => {
@@ -69,8 +70,8 @@ export function EnvImpactCalculator({ onBackToHome: _ }: EnvImpactCalculatorProp
     drug.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Load available doses for selected drug and form
-  const loadAvailableDoses = (drugName: string, form?: string) => {
+  // Load available doses for selected drug from second lookup table
+  const loadAvailableDoses = (drugName: string) => {
     if (!csvData.length || !drugName) {
       setAvailableDoses([]);
       setSelectedDose("");
@@ -79,43 +80,23 @@ export function EnvImpactCalculator({ onBackToHome: _ }: EnvImpactCalculatorProp
 
     const doses: string[] = [];
     
-    if (form && form.trim() !== '') {
-      // If form is selected, use third lookup table (column R)
-      for (let i = 5; i < csvData.length; i++) {
-        const row = csvData[i];
-        const rowDrugName = row[15]; // Column P
-        const rowForm = row[18]; // Column S
-        const dose = row[17]; // Column R
-        
-        if (rowDrugName === drugName && rowForm === form && dose && dose.trim() !== '') {
-          doses.push(dose);
-        }
-      }
-    } else {
-      // If no form selected, use second lookup table (column J)
-      for (let i = 5; i < csvData.length; i++) {
-        const row = csvData[i];
-        const rowDrugName = row[7]; // Column H
-        const dose = row[9]; // Column J
-        
-        if (rowDrugName === drugName && dose && dose.trim() !== '') {
-          doses.push(dose);
-        }
+    // Use second lookup table (column J)
+    for (let i = 5; i < csvData.length; i++) {
+      const row = csvData[i];
+      const rowDrugName = row[7]; // Column H
+      const dose = row[9]; // Column J
+      
+      if (rowDrugName === drugName && dose && dose.trim() !== '') {
+        doses.push(dose);
       }
     }
     
     setAvailableDoses(doses);
-    
-    // Auto-select first dose if form is selected
-    if (form && form.trim() !== '' && doses.length > 0) {
-      setSelectedDose(doses[0]);
-    } else {
-      setSelectedDose(""); // Reset selected dose when drug or form changes
-    }
+    setSelectedDose(""); // Reset selected dose when drug changes
   };
 
-  // Load available forms for selected drug from third lookup table
-  const loadAvailableForms = (drugName: string) => {
+  // Load available forms for selected drug and dose from third lookup table
+  const loadAvailableForms = (drugName: string, dose?: string, preserveFormSelection: boolean = false) => {
     if (!csvData.length || !drugName) {
       setAvailableForms([]);
       setSelectedForm("");
@@ -124,21 +105,39 @@ export function EnvImpactCalculator({ onBackToHome: _ }: EnvImpactCalculatorProp
 
     const forms: string[] = [];
     
-    // Look through the third lookup table (starting from column P, index 15)
-    for (let i = 5; i < csvData.length; i++) {
-      const row = csvData[i];
-      const rowDrugName = row[15]; // Column P
-      const form = row[18]; // Column S
-      
-      if (rowDrugName === drugName && form && form.trim() !== '') {
-        forms.push(form);
+    if (dose && dose.trim() !== '') {
+      // If dose is selected, filter forms by both drug and dose
+      for (let i = 5; i < csvData.length; i++) {
+        const row = csvData[i];
+        const rowDrugName = row[15]; // Column P
+        const rowDose = row[17]; // Column R
+        const form = row[18]; // Column S
+        
+        if (rowDrugName === drugName && rowDose === dose && form && form.trim() !== '') {
+          forms.push(form);
+        }
+      }
+    } else {
+      // If no dose selected, show all forms for the drug
+      for (let i = 5; i < csvData.length; i++) {
+        const row = csvData[i];
+        const rowDrugName = row[15]; // Column P
+        const form = row[18]; // Column S
+        
+        if (rowDrugName === drugName && form && form.trim() !== '') {
+          forms.push(form);
+        }
       }
     }
     
     // Remove duplicates and sort
     const uniqueForms = [...new Set(forms)].sort();
     setAvailableForms(uniqueForms);
-    setSelectedForm(""); // Reset selected form when drug changes
+    
+    // Only reset form selection if not preserving it
+    if (!preserveFormSelection) {
+      setSelectedForm("");
+    }
   };
 
   // Lookup environmental impact data
@@ -204,8 +203,8 @@ export function EnvImpactCalculator({ onBackToHome: _ }: EnvImpactCalculatorProp
   // Load doses and forms when drug is selected
   useEffect(() => {
     if (selectedDrug && csvData.length > 0) {
-      loadAvailableDoses(selectedDrug, selectedForm);
-      loadAvailableForms(selectedDrug);
+      loadAvailableDoses(selectedDrug);
+      loadAvailableForms(selectedDrug, selectedDose);
     } else {
       setAvailableDoses([]);
       setSelectedDose("");
@@ -214,19 +213,88 @@ export function EnvImpactCalculator({ onBackToHome: _ }: EnvImpactCalculatorProp
     }
   }, [selectedDrug, csvData]);
 
-  // Load doses when form changes
+  // Load forms when dose changes (but not when auto-selecting from form)
   useEffect(() => {
-    if (selectedDrug && csvData.length > 0) {
-      loadAvailableDoses(selectedDrug, selectedForm);
+    if (selectedDrug && csvData.length > 0 && !isAutoSelectingDose.current) {
+      // If there's an existing form selection, check if it's compatible with the new dose
+      if (selectedForm && selectedForm.trim() !== '') {
+        // Check if the current form is compatible with the new dose
+        let isCompatible = false;
+        for (let i = 5; i < csvData.length; i++) {
+          const row = csvData[i];
+          const rowDrugName = row[15]; // Column P
+          const rowDose = row[17]; // Column R
+          const rowForm = row[18]; // Column S
+          
+          if (rowDrugName === selectedDrug && rowDose === selectedDose && rowForm === selectedForm) {
+            isCompatible = true;
+            break;
+          }
+        }
+        
+        if (isCompatible) {
+          // Form is compatible with the new dose, just reload forms
+          loadAvailableForms(selectedDrug, selectedDose, true);
+        } else {
+          // Form is not compatible, try to find a dose that works with the current form
+          let foundCompatibleDose = false;
+          for (let i = 5; i < csvData.length; i++) {
+            const row = csvData[i];
+            const rowDrugName = row[15]; // Column P
+            const rowDose = row[17]; // Column R
+            const rowForm = row[18]; // Column S
+            
+            if (rowDrugName === selectedDrug && rowForm === selectedForm && rowDose && rowDose.trim() !== '') {
+              // Found a compatible dose for the current form
+              isAutoSelectingDose.current = true;
+              setSelectedDose(rowDose);
+              loadAvailableForms(selectedDrug, rowDose, true);
+              foundCompatibleDose = true;
+              setTimeout(() => {
+                isAutoSelectingDose.current = false;
+              }, 100);
+              break;
+            }
+          }
+          
+          if (!foundCompatibleDose) {
+            // No compatible dose found, clear the form
+            loadAvailableForms(selectedDrug, selectedDose);
+          }
+        }
+      } else {
+        // No existing form, just reload normally
+        loadAvailableForms(selectedDrug, selectedDose);
+      }
     }
-  }, [selectedForm, csvData]);
+  }, [selectedDose, csvData]);
 
-  // Clear form when dose is cleared
+  // Auto-select dose when form is selected (if no dose is currently selected)
   useEffect(() => {
-    if (selectedDose === "" && selectedForm !== "") {
-      setSelectedForm("");
+    if (selectedForm && selectedForm.trim() !== '' && selectedDrug && (!selectedDose || selectedDose.trim() === '') && csvData.length > 0) {
+      isAutoSelectingDose.current = true;
+      
+      // Find the first available dose for this drug-form combination
+      for (let i = 5; i < csvData.length; i++) {
+        const row = csvData[i];
+        const rowDrugName = row[15]; // Column P
+        const rowForm = row[18]; // Column S
+        const rowDose = row[17]; // Column R
+        
+        if (rowDrugName === selectedDrug && rowForm === selectedForm && rowDose && rowDose.trim() !== '') {
+          setSelectedDose(rowDose);
+          // Reload forms with the new dose but preserve the form selection
+          loadAvailableForms(selectedDrug, rowDose, true);
+          break;
+        }
+      }
+      
+      // Reset the flag after a short delay
+      setTimeout(() => {
+        isAutoSelectingDose.current = false;
+      }, 100);
     }
-  }, [selectedDose]);
+  }, [selectedForm, selectedDrug, selectedDose, csvData]);
 
   // Perform lookup when drug, method, dose, or form changes
   useEffect(() => {
