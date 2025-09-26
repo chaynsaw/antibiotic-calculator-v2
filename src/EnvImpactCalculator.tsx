@@ -248,14 +248,21 @@ export function EnvImpactCalculator({ onBackToHome: _ }: EnvImpactCalculatorProp
 
     // Calculate additional values for basic case (when Dose, Form, and Frequency are empty)
     // Get frequency multiplier (1 if no frequency selected)
-    const frequencyMultiplier = selectedFrequency && selectedFrequency.trim() !== '' ? parseFloat(selectedFrequency) : 1;
+    const frequencyMultiplier = selectedFrequency && selectedFrequency.trim() !== '' ? parseFloat(selectedFrequency) : 0;
     
     // Use effective days (minimum 1 for calculations)
     const effectiveDays = Math.max(days, 1);
     
-    const waste = effectiveDays * baseData.weightPerDOT * frequencyMultiplier; // Days x Column F value x Frequency
-    const co2e = effectiveDays * baseData.co2ePerDOT * frequencyMultiplier; // Days x Column D x Frequency
-    const distance = (effectiveDays * baseData.co2ePerDOT) / 0.000391; // (Days x Column D) / 0.000391 (distance based on base CO2e)
+    let waste, co2e;
+    
+    if (frequencyMultiplier !== 0) {
+      waste = effectiveDays * baseData.weightPerDose * frequencyMultiplier; // Days x Column E value x Frequency
+      co2e = effectiveDays * baseData.co2ePerDose * frequencyMultiplier; // Days x Column C x Frequency
+    } else {
+      waste = effectiveDays * baseData.weightPerDOT; // Days x Column F value x Frequency
+      co2e = effectiveDays * baseData.co2ePerDOT; // Days x Column D x Frequency
+    }
+    const distance = (co2e) / 0.000391; // (Days x Column D) / 0.000391 (distance based on base CO2e)
     const gas = co2e / 0.00887; // (Days * Column D * Frequency) / 0.00887
     const coal = co2e / 0.000907; // (Days * Column D * Frequency) / 0.000907
     const phones = co2e / 0.0000151; // (Days * Column D * Frequency) / 0.0000151
