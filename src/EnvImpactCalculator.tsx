@@ -667,13 +667,13 @@ export function EnvImpactCalculator({ onBackToHome: _ }: EnvImpactCalculatorProp
                   <div className="bg-slate-700/50 rounded-lg p-4">
                     <h4 className="text-sm font-medium text-slate-300 mb-2">CO2e per Dose</h4>
                     <p className="text-xl font-bold text-white">
-                      {environmentalImpact.co2ePerDose.toExponential(3)}
+                      {environmentalImpact.co2ePerDose.toExponential(3)} t
                     </p>
                   </div>
                   <div className="bg-slate-700/50 rounded-lg p-4">
                     <h4 className="text-sm font-medium text-slate-300 mb-2">CO2e per DOT</h4>
                     <p className="text-xl font-bold text-white">
-                      {environmentalImpact.co2ePerDOT.toExponential(3)}
+                      {environmentalImpact.co2ePerDOT.toExponential(3)} t
                     </p>
                   </div>
                   <div className="bg-slate-700/50 rounded-lg p-4">
@@ -701,37 +701,38 @@ export function EnvImpactCalculator({ onBackToHome: _ }: EnvImpactCalculatorProp
                 </h3>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   <div className="bg-slate-700/50 rounded-lg p-4">
-                    <h4 className="text-sm font-medium text-slate-300 mb-2">Waste</h4>
+                    <h4 className="text-sm font-medium text-slate-300 mb-2">Total Waste Generated</h4>
                     <p className="text-xl font-bold text-white">
                       {environmentalImpact.waste.toFixed(3)} g
                     </p>
                   </div>
                   <div className="bg-slate-700/50 rounded-lg p-4">
-                    <h4 className="text-sm font-medium text-slate-300 mb-2">CO2e</h4>
+                    <h4 className="text-sm font-medium text-slate-300 mb-2">Total CO2 Equivalent Emissions</h4>
                     <p className="text-xl font-bold text-white">
                       {environmentalImpact.co2e.toExponential(3)}
                     </p>
                   </div>
                   <div className="bg-slate-700/50 rounded-lg p-4">
-                    <h4 className="text-sm font-medium text-slate-300 mb-2">Distance</h4>
+                    <h4 className="text-sm font-medium text-slate-300 mb-2">Distance Driven
+                    </h4>
                     <p className="text-xl font-bold text-white">
                       {environmentalImpact.distance.toFixed(1)} km
                     </p>
                   </div>
                   <div className="bg-slate-700/50 rounded-lg p-4">
-                    <h4 className="text-sm font-medium text-slate-300 mb-2">Gas</h4>
+                    <h4 className="text-sm font-medium text-slate-300 mb-2">Gas Consumed</h4>
                     <p className="text-xl font-bold text-white">
                       {environmentalImpact.gas.toFixed(2)} L
                     </p>
                   </div>
                   <div className="bg-slate-700/50 rounded-lg p-4">
-                    <h4 className="text-sm font-medium text-slate-300 mb-2">Coal</h4>
+                    <h4 className="text-sm font-medium text-slate-300 mb-2">Coal Burned</h4>
                     <p className="text-xl font-bold text-white">
                       {environmentalImpact.coal.toFixed(3)} kg
                     </p>
                   </div>
                   <div className="bg-slate-700/50 rounded-lg p-4">
-                    <h4 className="text-sm font-medium text-slate-300 mb-2">Phones</h4>
+                    <h4 className="text-sm font-medium text-slate-300 mb-2">Number of Phones Charged</h4>
                     <p className="text-xl font-bold text-white">
                       {environmentalImpact.phones.toFixed(0)}
                     </p>
