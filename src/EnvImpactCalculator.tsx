@@ -160,11 +160,8 @@ export function EnvImpactCalculator({ onBackToHome: _ }: EnvImpactCalculatorProp
   };
 
   // Lookup distance comparison based on calculated distance
-  const lookupDistanceComparison = (distanceKm: number) => {
+  const lookupDistanceComparison = (distance: number) => {
     if (!csvData.length) return "Unknown";
-    
-    // Convert km to miles (1 km = 0.621371 miles)
-    const distanceMiles = distanceKm * 0.621371;
     
     // Look through the distance comparison data (columns AB, AC, AD)
     for (let i = 5; i < csvData.length; i++) {
@@ -173,7 +170,7 @@ export function EnvImpactCalculator({ onBackToHome: _ }: EnvImpactCalculatorProp
       const upperRange = parseFloat(row[28]) || 0; // Column AC (Distance Upper Range)
       const comparison = row[29]; // Column AD (Comparable Distance)
       
-      if (distanceMiles >= lowerRange && distanceMiles <= upperRange && comparison && comparison.trim() !== '') {
+      if (distance >= lowerRange && distance <= upperRange && comparison && comparison.trim() !== '') {
         return comparison;
       }
     }
@@ -270,7 +267,7 @@ export function EnvImpactCalculator({ onBackToHome: _ }: EnvImpactCalculatorProp
 
     return {
       ...baseData,
-      waste,
+      waste: waste * .1, // Convert grams to kilograms
       co2e,
       distance,
       gas,
@@ -703,20 +700,20 @@ export function EnvImpactCalculator({ onBackToHome: _ }: EnvImpactCalculatorProp
                   <div className="bg-slate-700/50 rounded-lg p-4">
                     <h4 className="text-sm font-medium text-slate-300 mb-2">Total Waste Generated</h4>
                     <p className="text-xl font-bold text-white">
-                      {environmentalImpact.waste.toFixed(3)} g
+                      {environmentalImpact.waste.toFixed(3)} kg
                     </p>
                   </div>
                   <div className="bg-slate-700/50 rounded-lg p-4">
                     <h4 className="text-sm font-medium text-slate-300 mb-2">Total CO2 Equivalent Emissions</h4>
                     <p className="text-xl font-bold text-white">
-                      {environmentalImpact.co2e.toExponential(3)}
+                      {environmentalImpact.co2e.toExponential(3)} t
                     </p>
                   </div>
                   <div className="bg-slate-700/50 rounded-lg p-4">
                     <h4 className="text-sm font-medium text-slate-300 mb-2">Distance Driven
                     </h4>
                     <p className="text-xl font-bold text-white">
-                      {environmentalImpact.distance.toFixed(1)} km
+                      {environmentalImpact.distance.toFixed(1)} miles
                     </p>
                   </div>
                   <div className="bg-slate-700/50 rounded-lg p-4">
