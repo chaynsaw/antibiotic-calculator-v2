@@ -37,6 +37,19 @@ export function EnvImpactCalculator({ onBackToHome: _ }: EnvImpactCalculatorProp
   const [days, setDays] = useState<number>(1);
   const [selectedFrequency, setSelectedFrequency] = useState<string>("");
   const [environmentalImpact, setEnvironmentalImpact] = useState<EnvironmentalImpact | null>(null);
+  
+  // Clear all form fields
+  const clearAllFields = () => {
+    setSelectedDrug("");
+    setSearchTerm("");
+    setSelectedDose("");
+    setAvailableDoses([]);
+    setSelectedForm("");
+    setAvailableForms([]);
+    setDays(1);
+    setSelectedFrequency("");
+    setEnvironmentalImpact(null);
+  };
   const [csvData, setCsvData] = useState<string[][]>([]);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const isAutoSelectingDose = useRef<boolean>(false);
@@ -650,6 +663,16 @@ export function EnvImpactCalculator({ onBackToHome: _ }: EnvImpactCalculatorProp
               </div>
             </div>
             </div>
+          </div>
+          
+          {/* Clear Sheet Button */}
+          <div className="mt-6 flex justify-center">
+            <button
+              onClick={clearAllFields}
+              className="px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md transition-colors duration-200 font-medium"
+            >
+              Clear Sheet
+            </button>
           </div>
           
           {/* Environmental Impact Results */}
