@@ -30,6 +30,7 @@ export function EnvImpactCalculator({ onBackToHome: _ }: EnvImpactCalculatorProp
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(0);
   const [selectedMethod, setSelectedMethod] = useState("IV");
+  const [selectedDisposalMethod, setSelectedDisposalMethod] = useState("Landfill");
   const [selectedDose, setSelectedDose] = useState("");
   const [availableDoses, setAvailableDoses] = useState<string[]>([]);
   const [selectedForm, setSelectedForm] = useState("");
@@ -48,6 +49,7 @@ export function EnvImpactCalculator({ onBackToHome: _ }: EnvImpactCalculatorProp
     setAvailableForms([]);
     setDays(1);
     setSelectedFrequency("");
+    setSelectedDisposalMethod("Landfill");
     setEnvironmentalImpact(null);
   };
   const [csvData, setCsvData] = useState<string[][]>([]);
@@ -62,6 +64,12 @@ export function EnvImpactCalculator({ onBackToHome: _ }: EnvImpactCalculatorProp
     { label: "Every 12 hours (q12h)", value: "2" },
     { label: "Every 24 hours (q24h)", value: "1" },
     { label: "Every 48 hours (q48h)", value: "0.5" }
+  ];
+
+  // Disposal method options
+  const disposalMethodOptions = [
+    { label: "Landfill", value: "Landfill" },
+    { label: "Incinerate", value: "Incinerate" }
   ];
 
   // Load drug names from CSV
@@ -81,10 +89,12 @@ export function EnvImpactCalculator({ onBackToHome: _ }: EnvImpactCalculatorProp
         
         // Start from row 6 (index 5) and extract drug names from column A
         const drugNames: DrugOption[] = [];
+        const drugNamesSet = new Set<string>();
         for (let i = 5; i < rows.length; i++) {
           const drugName = rows[i][0]; // Column A
-          if (drugName && drugName.trim() !== '') {
+          if (drugName && drugName.trim() !== '' && !drugNamesSet.has(drugName)) {
             drugNames.push({ name: drugName });
+            drugNamesSet.add(drugName);
           }
         }
         
@@ -112,13 +122,13 @@ export function EnvImpactCalculator({ onBackToHome: _ }: EnvImpactCalculatorProp
 
     const doses: string[] = [];
     
-    // Use second lookup table (column J)
+    // Use second lookup table (column L)
     for (let i = 5; i < csvData.length; i++) {
       const row = csvData[i];
-      const rowDrugName = row[7]; // Column H
-      const dose = row[9]; // Column J
+      const rowDrugName = row[8]; // Column I
+      const dose = row[11]; // Column L
       
-      if (rowDrugName === drugName && dose && dose.trim() !== '') {
+      if (rowDrugName === drugName && dose && dose.trim() !== '' && selectedDisposalMethod === row[10]) {
         doses.push(dose);
       }
     }
@@ -139,13 +149,15 @@ export function EnvImpactCalculator({ onBackToHome: _ }: EnvImpactCalculatorProp
     
     if (dose && dose.trim() !== '') {
       // If dose is selected, filter forms by both drug and dose
+      console.log(drugName, dose)
       for (let i = 5; i < csvData.length; i++) {
         const row = csvData[i];
-        const rowDrugName = row[15]; // Column P
-        const rowDose = row[17]; // Column R
-        const form = row[18]; // Column S
+        const rowDrugName = row[17]; // Column R
+        const rowDose = row[20]; // Column U
+        const form = row[21]; // Column V
+        const rowDisposalMethod = row[19]; // Column T
         
-        if (rowDrugName === drugName && rowDose === dose && form && form.trim() !== '') {
+        if (rowDrugName === drugName && rowDose === dose && rowDisposalMethod === selectedDisposalMethod&& form && form.trim() !== '') {
           forms.push(form);
         }
       }
@@ -153,10 +165,11 @@ export function EnvImpactCalculator({ onBackToHome: _ }: EnvImpactCalculatorProp
       // If no dose selected, show all forms for the drug
       for (let i = 5; i < csvData.length; i++) {
         const row = csvData[i];
-        const rowDrugName = row[15]; // Column P
-        const form = row[18]; // Column S
+        const rowDrugName = row[17]; // Column R
+        const rowDisposalMethod = row[19]; // Column T
+        const form = row[21]; // Column V
         
-        if (rowDrugName === drugName && form && form.trim() !== '') {
+        if (rowDrugName === drugName && rowDisposalMethod === selectedDisposalMethod && form && form.trim() !== '') {
           forms.push(form);
         }
       }
@@ -179,9 +192,9 @@ export function EnvImpactCalculator({ onBackToHome: _ }: EnvImpactCalculatorProp
     // Look through the distance comparison data (columns AB, AC, AD)
     for (let i = 5; i < csvData.length; i++) {
       const row = csvData[i];
-      const lowerRange = parseFloat(row[27]) || 0; // Column AB (Distance Lower Range)
-      const upperRange = parseFloat(row[28]) || 0; // Column AC (Distance Upper Range)
-      const comparison = row[29]; // Column AD (Comparable Distance)
+      const lowerRange = parseFloat(row[30]) || 0; // Column AE (Distance Lower Range)
+      const upperRange = parseFloat(row[31]) || 0; // Column AF (Distance Upper Range)
+      const comparison = row[32]; // Column AG (Comparable Distance)
       
       if (distance >= lowerRange && distance <= upperRange && comparison && comparison.trim() !== '') {
         return comparison;
@@ -192,7 +205,7 @@ export function EnvImpactCalculator({ onBackToHome: _ }: EnvImpactCalculatorProp
   };
 
   // Lookup environmental impact data
-  const lookupEnvironmentalImpact = (drugName: string, method: string, dose?: string, form?: string) => {
+  const lookupEnvironmentalImpact = (drugName: string, method: string, dose?: string, form?: string, disposalMethod?: string) => {
     if (!csvData.length) return null;
 
     let baseData = null;
@@ -201,17 +214,18 @@ export function EnvImpactCalculator({ onBackToHome: _ }: EnvImpactCalculatorProp
     if (form && form.trim() !== '' && dose && dose.trim() !== '') {
       for (let i = 5; i < csvData.length; i++) {
         const row = csvData[i];
-        const rowDrugName = row[15]; // Column P
-        const rowMethod = row[16]; // Column Q
-        const rowDose = row[17]; // Column R
-        const rowForm = row[18]; // Column S
+        const rowDrugName = row[17]; // Column R
+        const rowMethod = row[18]; // Column S
+        const rowDose = row[20]; // Column U
+        const rowForm = row[21]; // Column V
+        const rowDisposalMethod = row[19]; // Column T
         
-        if (rowDrugName === drugName && rowMethod === method && rowDose === dose && rowForm === form) {
+        if (rowDrugName === drugName && rowMethod === method && rowDose === dose && rowForm === form && rowDisposalMethod === disposalMethod) {
           baseData = {
-            co2ePerDose: parseFloat(row[19]) || 0, // Column T
-            co2ePerDOT: parseFloat(row[20]) || 0,  // Column U
-            weightPerDose: parseFloat(row[21]) || 0, // Column V
-            weightPerDOT: parseFloat(row[22]) || 0   // Column W
+            co2ePerDose: parseFloat(row[22]) || 0, // Column W
+            co2ePerDOT: parseFloat(row[23]) || 0,  // Column X
+            weightPerDose: parseFloat(row[24]) || 0, // Column Y
+            weightPerDOT: parseFloat(row[25]) || 0   // Column Z
           };
           break;
         }
@@ -221,16 +235,16 @@ export function EnvImpactCalculator({ onBackToHome: _ }: EnvImpactCalculatorProp
     else if (dose && dose.trim() !== '') {
       for (let i = 5; i < csvData.length; i++) {
         const row = csvData[i];
-        const rowDrugName = row[7]; // Column H
-        const rowMethod = row[8]; // Column I
-        const rowDose = row[9]; // Column J
+        const rowDrugName = row[8]; // Column I
+        const rowDisposalMethod = row[10]; // Column K
+        const rowDose = row[11]; // Column L
         
-        if (rowDrugName === drugName && rowMethod === method && rowDose === dose) {
+        if (rowDrugName === drugName && rowDisposalMethod === disposalMethod && rowDose === dose) {
           baseData = {
-            co2ePerDose: parseFloat(row[10]) || 0, // Column K
-            co2ePerDOT: parseFloat(row[11]) || 0,  // Column L
-            weightPerDose: parseFloat(row[12]) || 0, // Column M
-            weightPerDOT: parseFloat(row[13]) || 0   // Column N
+            co2ePerDose: parseFloat(row[12]) || 0, // Column M
+            co2ePerDOT: parseFloat(row[13]) || 0,  // Column N
+            weightPerDose: parseFloat(row[14]) || 0, // Column O
+            weightPerDOT: parseFloat(row[15]) || 0   // Column P
           };
           break;
         }
@@ -241,13 +255,14 @@ export function EnvImpactCalculator({ onBackToHome: _ }: EnvImpactCalculatorProp
         const row = csvData[i];
         const rowDrugName = row[0]; // Column A
         const rowMethod = row[1]; // Column B
+        const rowDisposalMethod = row[2]; // Column C
         
-        if (rowDrugName === drugName && rowMethod === method) {
+        if (rowDrugName === drugName && rowMethod === method && rowDisposalMethod === selectedDisposalMethod) {
           baseData = {
-            co2ePerDose: parseFloat(row[2]) || 0, // Column C
-            co2ePerDOT: parseFloat(row[3]) || 0,  // Column D
-            weightPerDose: parseFloat(row[4]) || 0, // Column E
-            weightPerDOT: parseFloat(row[5]) || 0   // Column F
+            co2ePerDose: parseFloat(row[3]) || 0, // Column C
+            co2ePerDOT: parseFloat(row[4]) || 0,  // Column D
+            weightPerDose: parseFloat(row[5]) || 0, // Column E
+            weightPerDOT: parseFloat(row[6]) || 0   // Column F
           };
           break;
         }
@@ -301,7 +316,7 @@ export function EnvImpactCalculator({ onBackToHome: _ }: EnvImpactCalculatorProp
       setAvailableForms([]);
       setSelectedForm("");
     }
-  }, [selectedDrug, csvData]);
+  }, [selectedDrug, selectedDisposalMethod, csvData]);
 
   // Load forms when dose changes (but not when auto-selecting from form)
   useEffect(() => {
@@ -396,12 +411,12 @@ export function EnvImpactCalculator({ onBackToHome: _ }: EnvImpactCalculatorProp
   // Perform lookup when drug, method, dose, form, days, or frequency changes
   useEffect(() => {
     if (selectedDrug && selectedMethod && csvData.length > 0) {
-      const impact = lookupEnvironmentalImpact(selectedDrug, selectedMethod, selectedDose, selectedForm);
+      const impact = lookupEnvironmentalImpact(selectedDrug, selectedMethod, selectedDose, selectedForm, selectedDisposalMethod);
       setEnvironmentalImpact(impact);
     } else {
       setEnvironmentalImpact(null);
     }
-  }, [selectedDrug, selectedMethod, selectedDose, selectedForm, days, selectedFrequency, csvData]);
+  }, [selectedDrug, selectedMethod, selectedDose, selectedForm, selectedDisposalMethod, days, selectedFrequency, csvData]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -433,6 +448,7 @@ export function EnvImpactCalculator({ onBackToHome: _ }: EnvImpactCalculatorProp
           </header>
           <div className="bg-slate-700/50 backdrop-blur-sm rounded-lg p-6 shadow-xl border border-slate-600">
             <div className="space-y-4 mb-8">
+              {/* First row: Antibiotic, Disposal Method */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="relative">
                   <label className="block text-sm font-medium text-slate-300 mb-1">
@@ -542,19 +558,17 @@ export function EnvImpactCalculator({ onBackToHome: _ }: EnvImpactCalculatorProp
 
               <div className="relative">
                 <label className="block text-sm font-medium text-slate-300 mb-1">
-                  Dose (optional)
+                  Disposal Method
                 </label>
                 <div className="relative">
                   <select
-                    value={selectedDose}
-                    onChange={(e) => setSelectedDose(e.target.value)}
-                    disabled={availableDoses.length === 0}
-                    className="appearance-none bg-slate-800 border border-slate-600 text-white py-3 px-4 pr-8 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                    value={selectedDisposalMethod}
+                    onChange={(e) => setSelectedDisposalMethod(e.target.value)}
+                    className="appearance-none bg-slate-800 border border-slate-600 text-white py-3 px-4 pr-8 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   >
-                    <option value="">Select dose...</option>
-                    {availableDoses.map((dose, index) => (
-                      <option key={index} value={dose}>
-                        {dose}
+                    {disposalMethodOptions.map((option, index) => (
+                      <option key={index} value={option.value}>
+                        {option.label}
                       </option>
                     ))}
                   </select>
@@ -565,7 +579,32 @@ export function EnvImpactCalculator({ onBackToHome: _ }: EnvImpactCalculatorProp
               </div>
           </div>
           
+              {/* Second row: Dose (optional), Administration Method */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="relative">
+                  <label className="block text-sm font-medium text-slate-300 mb-1">
+                    Dose (optional)
+                  </label>
+                  <div className="relative">
+                    <select
+                      value={selectedDose}
+                      onChange={(e) => setSelectedDose(e.target.value)}
+                      disabled={availableDoses.length === 0}
+                      className="appearance-none bg-slate-800 border border-slate-600 text-white py-3 px-4 pr-8 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <option value="">Select dose...</option>
+                      {availableDoses.map((dose, index) => (
+                        <option key={index} value={dose}>
+                          {dose}
+                        </option>
+                      ))}
+                    </select>
+                    <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                      <ChevronDown size={18} className="text-slate-400" />
+                    </div>
+                  </div>
+            </div>
+            
                 <div className="relative">
                   <label className="block text-sm font-medium text-slate-300 mb-1">
                     Administration Method
@@ -583,7 +622,10 @@ export function EnvImpactCalculator({ onBackToHome: _ }: EnvImpactCalculatorProp
                     </div>
                   </div>
             </div>
+            </div>
             
+              {/* Third row: Form (Optional), Days */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="relative">
                   <label className="block text-sm font-medium text-slate-300 mb-1">
                     Form (optional)
@@ -607,38 +649,38 @@ export function EnvImpactCalculator({ onBackToHome: _ }: EnvImpactCalculatorProp
                     </div>
                   </div>
                 </div>
+                
+                <div className="relative">
+                  <label className="block text-sm font-medium text-slate-300 mb-1">
+                    Days
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={days}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (value === '') {
+                        setDays(0); // Allow empty value temporarily
+                      } else {
+                        const numValue = parseInt(value);
+                        setDays(numValue || 0);
+                      }
+                    }}
+                    onBlur={(e) => {
+                      const value = parseInt(e.target.value);
+                      if (!value || value < 1) {
+                        setDays(1);
+                      }
+                    }}
+                    className="bg-slate-800 border border-slate-600 text-white py-3 px-4 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="1"
+                  />
+                </div>
             </div>
             
-            {/* Days and Frequency fields */}
+            {/* Fourth row: Frequency (Optional) */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="relative">
-                <label className="block text-sm font-medium text-slate-300 mb-1">
-                  Days
-                </label>
-              <input
-                type="number"
-                min="1"
-                value={days}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  if (value === '') {
-                    setDays(0); // Allow empty value temporarily
-                  } else {
-                    const numValue = parseInt(value);
-                    setDays(numValue || 0);
-                  }
-                }}
-                onBlur={(e) => {
-                  const value = parseInt(e.target.value);
-                  if (!value || value < 1) {
-                    setDays(1);
-                  }
-                }}
-                className="bg-slate-800 border border-slate-600 text-white py-3 px-4 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="1"
-              />
-              </div>
-              
               <div className="relative">
                 <label className="block text-sm font-medium text-slate-300 mb-1">
                   Frequency (optional)
