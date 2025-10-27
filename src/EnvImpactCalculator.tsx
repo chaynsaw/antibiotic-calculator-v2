@@ -1,4 +1,4 @@
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Trash2, Edit } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 
 interface EnvImpactCalculatorProps {
@@ -23,6 +23,18 @@ interface EnvironmentalImpact {
   distanceComparison: string;
 }
 
+interface SavedRegimen {
+  id: number;
+  drug: string;
+  method: string;
+  disposalMethod: string;
+  dose: string;
+  form: string;
+  days: number;
+  frequency: string;
+  environmentalImpact: EnvironmentalImpact;
+}
+
 export function EnvImpactCalculator({ onBackToHome: _ }: EnvImpactCalculatorProps) {
   const [drugs, setDrugs] = useState<DrugOption[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -38,6 +50,8 @@ export function EnvImpactCalculator({ onBackToHome: _ }: EnvImpactCalculatorProp
   const [days, setDays] = useState<number>(1);
   const [selectedFrequency, setSelectedFrequency] = useState<string>("");
   const [environmentalImpact, setEnvironmentalImpact] = useState<EnvironmentalImpact | null>(null);
+  const [savedRegimens, setSavedRegimens] = useState<SavedRegimen[]>([]);
+  const [editingRegimenId, setEditingRegimenId] = useState<number | null>(null);
   
   // Clear all form fields
   const clearAllFields = () => {
@@ -52,6 +66,72 @@ export function EnvImpactCalculator({ onBackToHome: _ }: EnvImpactCalculatorProp
     setSelectedDisposalMethod("Landfill");
     setEnvironmentalImpact(null);
   };
+
+  // Save current regimen
+  const saveCurrentRegimen = () => {
+    if (!environmentalImpact || !selectedDrug) return;
+
+    const regimen: SavedRegimen = {
+      id: Date.now(),
+      drug: selectedDrug,
+      method: selectedMethod,
+      disposalMethod: selectedDisposalMethod,
+      dose: selectedDose,
+      form: selectedForm,
+      days,
+      frequency: selectedFrequency,
+      environmentalImpact: { ...environmentalImpact },
+    };
+
+    setSavedRegimens((prev) => [...prev, regimen]);
+    clearAllFields();
+  };
+
+  // Delete a saved regimen
+  const deleteRegimen = (id: number) => {
+    setSavedRegimens((prev) => prev.filter((r) => r.id !== id));
+  };
+
+  // Start editing a saved regimen
+  const startEditing = (regimenId: number) => {
+    setEditingRegimenId(regimenId);
+  };
+
+  // Cancel editing
+  const cancelEditing = () => {
+    setEditingRegimenId(null);
+  };
+
+  // Update a saved regimen
+  const updateRegimen = (regimenId: number, updatedFields: Partial<SavedRegimen>) => {
+    setSavedRegimens((prev) =>
+      prev.map((regimen) =>
+        regimen.id === regimenId ? { ...regimen, ...updatedFields } : regimen
+      )
+    );
+    setEditingRegimenId(null);
+  };
+
+  // Start over - clear all saved regimens
+  const startOver = () => {
+    setSavedRegimens([]);
+    clearAllFields();
+  };
+
+  // Calculate number of doses
+  const calculateDoses = (days: number, frequency: string) => {
+    if (!frequency) return days;
+    const freqValue = parseFloat(frequency);
+    if (!freqValue) return days;
+    return Math.ceil(days * freqValue);
+  };
+
+  // Get frequency label
+  const getFrequencyLabel = (value: string) => {
+    const option = frequencyOptions.find((opt) => opt.value === value);
+    return option?.label || "";
+  };
+
   const [csvData, setCsvData] = useState<string[][]>([]);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const isAutoSelectingDose = useRef<boolean>(false);
@@ -149,7 +229,6 @@ export function EnvImpactCalculator({ onBackToHome: _ }: EnvImpactCalculatorProp
     
     if (dose && dose.trim() !== '') {
       // If dose is selected, filter forms by both drug and dose
-      console.log(drugName, dose)
       for (let i = 5; i < csvData.length; i++) {
         const row = csvData[i];
         const rowDrugName = row[17]; // Column R
@@ -204,8 +283,9 @@ export function EnvImpactCalculator({ onBackToHome: _ }: EnvImpactCalculatorProp
     return "Distance exceeds comparison range";
   };
 
+
   // Lookup environmental impact data
-  const lookupEnvironmentalImpact = (drugName: string, method: string, dose?: string, form?: string, disposalMethod?: string) => {
+  const lookupEnvironmentalImpact = (drugName: string, method: string, dose?: string, form?: string, disposalMethod?: string, daysParam?: number, frequencyParam?: string) => {
     if (!csvData.length) return null;
 
     let baseData = null;
@@ -273,10 +353,11 @@ export function EnvImpactCalculator({ onBackToHome: _ }: EnvImpactCalculatorProp
 
     // Calculate additional values for basic case (when Dose, Form, and Frequency are empty)
     // Get frequency multiplier (1 if no frequency selected)
-    const frequencyMultiplier = selectedFrequency && selectedFrequency.trim() !== '' ? parseFloat(selectedFrequency) : 0;
+    const activeFrequency = frequencyParam !== undefined ? frequencyParam : selectedFrequency;
+    const frequencyMultiplier = activeFrequency && activeFrequency.trim() !== '' ? parseFloat(activeFrequency) : 0;
     
     // Use effective days (minimum 1 for calculations)
-    const effectiveDays = Math.max(days, 1);
+    const effectiveDays = Math.max(daysParam !== undefined ? daysParam : days, 1);
     
     let waste, co2e;
     
@@ -431,6 +512,44 @@ export function EnvImpactCalculator({ onBackToHome: _ }: EnvImpactCalculatorProp
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
+
+  // Calculate aggregated environmental impact from saved regimens and current calculation
+  let totalWaste = 0;
+  let totalCO2e = 0;
+  let totalDistance = 0;
+  let totalGas = 0;
+  let totalCoal = 0;
+  let totalPhones = 0;
+  
+  // Add impact from saved regimens
+  savedRegimens.forEach((regimen) => {
+    totalWaste += regimen.environmentalImpact.waste;
+    totalCO2e += regimen.environmentalImpact.co2e;
+    totalDistance += regimen.environmentalImpact.distance;
+    totalGas += regimen.environmentalImpact.gas;
+    totalCoal += regimen.environmentalImpact.coal;
+    totalPhones += regimen.environmentalImpact.phones;
+  });
+  
+  // Add current impact if it exists
+  if (environmentalImpact) {
+    totalWaste += environmentalImpact.waste;
+    totalCO2e += environmentalImpact.co2e;
+    totalDistance += environmentalImpact.distance;
+    totalGas += environmentalImpact.gas;
+    totalCoal += environmentalImpact.coal;
+    totalPhones += environmentalImpact.phones;
+  }
+  
+  const aggregatedImpact = {
+    waste: totalWaste,
+    co2e: totalCO2e,
+    distance: totalDistance,
+    gas: totalGas,
+    coal: totalCoal,
+    phones: totalPhones,
+    distanceComparison: lookupDistanceComparison(totalDistance)
+  };
 
   return (
     <div className="bg-gradient-to-b from-slate-800 to-slate-900 min-h-screen text-white">
@@ -707,96 +826,161 @@ export function EnvImpactCalculator({ onBackToHome: _ }: EnvImpactCalculatorProp
             </div>
           </div>
           
-          {/* Clear Sheet Button */}
-          <div className="mt-6 flex justify-center">
+          {/* Clear Sheet and Save Regimen Buttons */}
+          <div className="mt-6 flex justify-center gap-4">
             <button
               onClick={clearAllFields}
               className="px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md transition-colors duration-200 font-medium"
             >
               Clear Sheet
             </button>
+            <button
+              onClick={saveCurrentRegimen}
+              disabled={!selectedDrug || !environmentalImpact}
+              className="px-6 py-2 bg-slate-600 hover:bg-slate-700 text-white rounded-md transition-colors duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Save Regimen
+            </button>
           </div>
+
+          {/* Saved Regimens Display */}
+          {savedRegimens.length > 0 && (
+            <div className="mt-8 bg-slate-700/50 backdrop-blur-sm rounded-lg p-6 shadow-xl border border-slate-600">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-2xl font-semibold text-white">Saved Regimens</h2>
+                <button
+                  onClick={startOver}
+                  className="px-6 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-md transition-colors duration-200 font-medium"
+                >
+                  Start over
+                </button>
+              </div>
+              
+              <div className="space-y-3">
+                {savedRegimens.map((regimen, index) => {
+                  const isEditing = editingRegimenId === regimen.id;
+                  const doses = calculateDoses(regimen.days, regimen.frequency);
+                  const frequencyLabel = getFrequencyLabel(regimen.frequency);
+                  
+                  // Format the dose/form display
+                  let doseFormDisplay = "";
+                  if (regimen.dose && regimen.form) {
+                    doseFormDisplay = ` (${regimen.dose}/${regimen.form})`;
+                  } else if (regimen.dose) {
+                    doseFormDisplay = ` (${regimen.dose})`;
+                  } else if (regimen.form) {
+                    doseFormDisplay = ` (${regimen.form})`;
+                  }
+                  
+                  return (
+                    <div key={regimen.id}>
+                      {/* Regimen Row */}
+                      <div
+                        className="bg-slate-800/80 rounded-lg p-4 flex items-center justify-between hover:bg-slate-750/80 transition-colors duration-150"
+                      >
+                        <div className="flex-1">
+                          <p className="text-white font-medium">
+                            {index + 1}. {regimen.method} {regimen.drug}
+                            {regimen.frequency && ` ${frequencyLabel}`}
+                            {doseFormDisplay} x {doses} doses
+                          </p>
+                        </div>
+                        <div className="flex items-center space-x-2 ml-4">
+                          <button
+                            onClick={() => isEditing ? cancelEditing() : startEditing(regimen.id)}
+                            className="text-blue-500 hover:text-blue-600 p-2 transition-colors duration-150"
+                            aria-label="Edit regimen"
+                          >
+                            <Edit size={20} />
+                          </button>
+                          <button
+                            onClick={() => deleteRegimen(regimen.id)}
+                            className="text-orange-500 hover:text-orange-600 p-2 transition-colors duration-150"
+                            aria-label="Delete regimen"
+                          >
+                            <Trash2 size={20} />
+                          </button>
+                        </div>
+                      </div>
+                      
+                      {/* Editable Form (Dropdown) */}
+                      {isEditing && (
+                        <RegimenEditForm
+                          regimen={regimen}
+                          drugs={drugs}
+                          frequencyOptions={frequencyOptions}
+                          disposalMethodOptions={disposalMethodOptions}
+                          csvData={csvData}
+                          onUpdate={(updatedFields) => updateRegimen(regimen.id, updatedFields)}
+                          onCancel={cancelEditing}
+                          lookupEnvironmentalImpact={lookupEnvironmentalImpact}
+                        />
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
           
           {/* Environmental Impact Results */}
-          {environmentalImpact && (
+          {(savedRegimens.length > 0 || environmentalImpact) && (
             <div className="mt-8 bg-slate-800/80 rounded-lg p-6 border border-slate-700">
-              <h2 className="text-xl font-semibold mb-4 text-white">Environmental Impact Results</h2>
+              <h2 className="text-xl font-semibold mb-4 text-white">
+                Environmental Impact Results
+                {(savedRegimens.length > 0 && environmentalImpact) && (
+                  <span className="text-base font-normal text-slate-400 ml-2">
+                    (Aggregated from {savedRegimens.length + 1} {savedRegimens.length === 0 ? 'regimen' : 'regimens'})
+                  </span>
+                )}
+                {savedRegimens.length > 0 && !environmentalImpact && (
+                  <span className="text-base font-normal text-slate-400 ml-2">
+                    (From {savedRegimens.length} saved {savedRegimens.length === 1 ? 'regimen' : 'regimens'})
+                  </span>
+                )}
+              </h2>
               
-              {/* Basic Lookup Values */}
-              <div className="mb-6">
-                <h3 className="text-lg font-medium text-slate-300 mb-3">Base Values</h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="bg-slate-700/50 rounded-lg p-4">
-                    <h4 className="text-sm font-medium text-slate-300 mb-2">CO2e per Dose</h4>
-                    <p className="text-xl font-bold text-white">
-                      {environmentalImpact.co2ePerDose.toExponential(3)} t
-                    </p>
-                  </div>
-                  <div className="bg-slate-700/50 rounded-lg p-4">
-                    <h4 className="text-sm font-medium text-slate-300 mb-2">CO2e per DOT</h4>
-                    <p className="text-xl font-bold text-white">
-                      {environmentalImpact.co2ePerDOT.toExponential(3)} t
-                    </p>
-                  </div>
-                  <div className="bg-slate-700/50 rounded-lg p-4">
-                    <h4 className="text-sm font-medium text-slate-300 mb-2">Weight per Dose</h4>
-                    <p className="text-xl font-bold text-white">
-                      {environmentalImpact.weightPerDose.toFixed(3)} g
-                    </p>
-                  </div>
-                  <div className="bg-slate-700/50 rounded-lg p-4">
-                    <h4 className="text-sm font-medium text-slate-300 mb-2">Weight per DOT</h4>
-                    <p className="text-xl font-bold text-white">
-                      {environmentalImpact.weightPerDOT.toFixed(3)} g
-                    </p>
-                  </div>
-                </div>
-              </div>
-
               {/* Calculated Values */}
               <div>
                 <h3 className="text-lg font-medium text-slate-300 mb-3">
-                  Calculated Impact ({Math.max(days, 1)} day{Math.max(days, 1) !== 1 ? 's' : ''}
-                  {selectedFrequency && selectedFrequency.trim() !== '' && (
-                    <span> × {frequencyOptions.find(opt => opt.value === selectedFrequency)?.label}</span>
-                  )})
+                  Total Calculated Impact
                 </h3>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   <div className="bg-slate-700/50 rounded-lg p-4">
                     <h4 className="text-sm font-medium text-slate-300 mb-2">Total Waste Generated</h4>
                     <p className="text-xl font-bold text-white">
-                      {environmentalImpact.waste.toFixed(3)} kg
+                      {aggregatedImpact.waste.toFixed(3)} kg
                     </p>
                   </div>
                   <div className="bg-slate-700/50 rounded-lg p-4">
                     <h4 className="text-sm font-medium text-slate-300 mb-2">Total CO2 Equivalent Emissions</h4>
                     <p className="text-xl font-bold text-white">
-                      {environmentalImpact.co2e.toExponential(3)} t
+                      {aggregatedImpact.co2e.toExponential(3)} t
                     </p>
                   </div>
                   <div className="bg-slate-700/50 rounded-lg p-4">
                     <h4 className="text-sm font-medium text-slate-300 mb-2">Distance Driven
                     </h4>
                     <p className="text-xl font-bold text-white">
-                      {environmentalImpact.distance.toFixed(1)} miles
+                      {aggregatedImpact.distance.toFixed(1)} miles
                     </p>
                   </div>
                   <div className="bg-slate-700/50 rounded-lg p-4">
                     <h4 className="text-sm font-medium text-slate-300 mb-2">Gas Consumed</h4>
                     <p className="text-xl font-bold text-white">
-                      {environmentalImpact.gas.toFixed(2)} L
+                      {aggregatedImpact.gas.toFixed(2)} L
                     </p>
                   </div>
                   <div className="bg-slate-700/50 rounded-lg p-4">
                     <h4 className="text-sm font-medium text-slate-300 mb-2">Coal Burned</h4>
                     <p className="text-xl font-bold text-white">
-                      {environmentalImpact.coal.toFixed(3)} kg
+                      {aggregatedImpact.coal.toFixed(3)} kg
                     </p>
                   </div>
                   <div className="bg-slate-700/50 rounded-lg p-4">
                     <h4 className="text-sm font-medium text-slate-300 mb-2">Number of Phones Charged</h4>
                     <p className="text-xl font-bold text-white">
-                      {environmentalImpact.phones.toFixed(0)}
+                      {aggregatedImpact.phones.toFixed(0)}
                     </p>
                   </div>
                 </div>
@@ -808,10 +992,10 @@ export function EnvImpactCalculator({ onBackToHome: _ }: EnvImpactCalculatorProp
                 <div className="bg-slate-700/50 rounded-lg p-4">
                   <h4 className="text-sm font-medium text-slate-300 mb-2">Comparable Distance</h4>
                   <p className="text-xl font-bold text-white">
-                    {environmentalImpact.distanceComparison}
+                    {aggregatedImpact.distanceComparison}
                   </p>
                   <p className="text-sm text-slate-400 mt-1">
-                    Based on {environmentalImpact.distance.toFixed(1)} km total distance
+                    Based on {aggregatedImpact.distance.toFixed(1)} km total distance
                   </p>
                 </div>
               </div>
@@ -819,6 +1003,220 @@ export function EnvImpactCalculator({ onBackToHome: _ }: EnvImpactCalculatorProp
           )}
         </div>
       </main>
+    </div>
+  );
+}
+
+// Component for editing a saved regimen
+interface RegimenEditFormProps {
+  regimen: SavedRegimen;
+  drugs: DrugOption[];
+  frequencyOptions: Array<{ label: string; value: string }>;
+  disposalMethodOptions: Array<{ label: string; value: string }>;
+  csvData: string[][];
+  onUpdate: (updatedFields: Partial<SavedRegimen>) => void;
+  onCancel: () => void;
+  lookupEnvironmentalImpact: (drugName: string, method: string, dose?: string, form?: string, disposalMethod?: string, days?: number, frequency?: string) => EnvironmentalImpact | null;
+}
+
+function RegimenEditForm({
+  regimen,
+  drugs,
+  frequencyOptions,
+  disposalMethodOptions,
+  csvData,
+  onUpdate,
+  onCancel,
+  lookupEnvironmentalImpact,
+}: RegimenEditFormProps) {
+  const [editedDrug, setEditedDrug] = useState(regimen.drug);
+  const [editedMethod, setEditedMethod] = useState(regimen.method);
+  const [editedDisposalMethod, setEditedDisposalMethod] = useState(regimen.disposalMethod);
+  const [editedDose, setEditedDose] = useState(regimen.dose);
+  const [editedForm, setEditedForm] = useState(regimen.form);
+  const [editedDays, setEditedDays] = useState(regimen.days);
+  const [editedFrequency, setEditedFrequency] = useState(regimen.frequency);
+
+  // Get available doses and forms for the selected drug
+  const getAvailableDosesForDrug = (drugName: string) => {
+    const doses: string[] = [];
+    for (let i = 5; i < csvData.length; i++) {
+      const row = csvData[i];
+      const rowDrugName = row[8];
+      const dose = row[11];
+      if (rowDrugName === drugName && dose && dose.trim() !== '' && editedDisposalMethod === row[10]) {
+        doses.push(dose);
+      }
+    }
+    return doses;
+  };
+
+  const getAvailableFormsForDrug = (drugName: string, dose?: string) => {
+    const forms: string[] = [];
+    if (dose && dose.trim() !== '') {
+      for (let i = 5; i < csvData.length; i++) {
+        const row = csvData[i];
+        const rowDrugName = row[17];
+        const rowDose = row[20];
+        const form = row[21];
+        const rowDisposalMethod = row[19];
+        if (rowDrugName === drugName && rowDose === dose && rowDisposalMethod === editedDisposalMethod && form && form.trim() !== '') {
+          forms.push(form);
+        }
+      }
+    }
+    return [...new Set(forms)].sort();
+  };
+
+  const availableDoses = getAvailableDosesForDrug(editedDrug);
+  const availableForms = getAvailableFormsForDrug(editedDrug, editedDose);
+
+  const handleSave = () => {
+    // Recalculate environmental impact based on edited fields
+    const newEnvironmentalImpact = lookupEnvironmentalImpact(
+      editedDrug,
+      editedMethod,
+      editedDose,
+      editedForm,
+      editedDisposalMethod,
+      editedDays,
+      editedFrequency
+    );
+    
+    const updatedRegimen: Partial<SavedRegimen> = {
+      drug: editedDrug,
+      method: editedMethod,
+      disposalMethod: editedDisposalMethod,
+      dose: editedDose,
+      form: editedForm,
+      days: editedDays,
+      frequency: editedFrequency,
+      environmentalImpact: newEnvironmentalImpact || regimen.environmentalImpact,
+    };
+    onUpdate(updatedRegimen);
+  };
+
+  return (
+    <div className="mt-3 bg-slate-700/50 rounded-lg p-4 border border-slate-600">
+      <h3 className="text-lg font-semibold text-white mb-4">Edit Regimen</h3>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-medium text-slate-300 mb-1">Drug</label>
+          <select
+            value={editedDrug}
+            onChange={(e) => setEditedDrug(e.target.value)}
+            className="appearance-none bg-slate-800 border border-slate-600 text-white py-2 px-3 rounded-md w-full"
+          >
+            {drugs.map((drug) => (
+              <option key={drug.name} value={drug.name}>
+                {drug.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-slate-300 mb-1">Disposal Method</label>
+          <select
+            value={editedDisposalMethod}
+            onChange={(e) => setEditedDisposalMethod(e.target.value)}
+            className="appearance-none bg-slate-800 border border-slate-600 text-white py-2 px-3 rounded-md w-full"
+          >
+            {disposalMethodOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-slate-300 mb-1">Method</label>
+          <select
+            value={editedMethod}
+            onChange={(e) => setEditedMethod(e.target.value)}
+            className="appearance-none bg-slate-800 border border-slate-600 text-white py-2 px-3 rounded-md w-full"
+          >
+            <option value="IV">IV</option>
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-slate-300 mb-1">Dose (optional)</label>
+          <select
+            value={editedDose}
+            onChange={(e) => setEditedDose(e.target.value)}
+            disabled={availableDoses.length === 0}
+            className="appearance-none bg-slate-800 border border-slate-600 text-white py-2 px-3 rounded-md w-full disabled:opacity-50"
+          >
+            <option value="">Select dose...</option>
+            {availableDoses.map((dose) => (
+              <option key={dose} value={dose}>
+                {dose}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-slate-300 mb-1">Form (optional)</label>
+          <select
+            value={editedForm}
+            onChange={(e) => setEditedForm(e.target.value)}
+            disabled={availableForms.length === 0}
+            className="appearance-none bg-slate-800 border border-slate-600 text-white py-2 px-3 rounded-md w-full disabled:opacity-50"
+          >
+            <option value="">Select form...</option>
+            {availableForms.map((form) => (
+              <option key={form} value={form}>
+                {form}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-slate-300 mb-1">Days</label>
+          <input
+            type="number"
+            min="1"
+            value={editedDays}
+            onChange={(e) => setEditedDays(parseInt(e.target.value) || 1)}
+            className="bg-slate-800 border border-slate-600 text-white py-2 px-3 rounded-md w-full"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-slate-300 mb-1">Frequency (optional)</label>
+          <select
+            value={editedFrequency}
+            onChange={(e) => setEditedFrequency(e.target.value)}
+            className="appearance-none bg-slate-800 border border-slate-600 text-white py-2 px-3 rounded-md w-full"
+          >
+            <option value="">Select frequency...</option>
+            {frequencyOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      <div className="flex justify-end gap-3 mt-4">
+        <button
+          onClick={onCancel}
+          className="px-4 py-2 bg-slate-600 hover:bg-slate-700 text-white rounded-md transition-colors duration-200"
+        >
+          Cancel
+        </button>
+        <button
+          onClick={handleSave}
+          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors duration-200"
+        >
+          Save Changes
+        </button>
+      </div>
     </div>
   );
 }
