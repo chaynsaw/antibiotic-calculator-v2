@@ -1,4 +1,4 @@
-import { ChevronDown, Trash2, Edit } from "lucide-react";
+import { ChevronDown, Trash2, Edit, Fuel, Factory, Smartphone } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 
 interface EnvImpactCalculatorProps {
@@ -939,8 +939,40 @@ export function EnvImpactCalculator({ onBackToHome: _ }: EnvImpactCalculatorProp
                   </span>
                 )}
               </h2>
-              
-              {/* Calculated Values */}
+              {selectedDrug && environmentalImpact && (
+                <div className="mb-6">
+                  <h3 className="text-lg font-medium text-slate-300 mb-3">Base Values</h3>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="bg-slate-700/50 rounded-lg p-4">
+                      <h4 className="text-sm font-medium text-slate-300 mb-2">CO2e per Dose</h4>
+                      <p className="text-xl font-bold text-white">
+                        {environmentalImpact.co2ePerDose.toExponential(3)} t
+                      </p>
+                    </div>
+                    <div className="bg-slate-700/50 rounded-lg p-4">
+                      <h4 className="text-sm font-medium text-slate-300 mb-2">CO2e per DOT</h4>
+                      <p className="text-xl font-bold text-white">
+                        {environmentalImpact.co2ePerDOT.toExponential(3)} t
+                      </p>
+                    </div>
+                    <div className="bg-slate-700/50 rounded-lg p-4">
+                      <h4 className="text-sm font-medium text-slate-300 mb-2">Weight per Dose</h4>
+                      <p className="text-xl font-bold text-white">
+                        {environmentalImpact.weightPerDose.toFixed(3)} g
+                      </p>
+                    </div>
+                    <div className="bg-slate-700/50 rounded-lg p-4">
+                      <h4 className="text-sm font-medium text-slate-300 mb-2">Weight per DOT</h4>
+                      <p className="text-xl font-bold text-white">
+                        {environmentalImpact.weightPerDOT.toFixed(3)} g
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Calculated Values */
+              }
               <div>
                 <h3 className="text-lg font-medium text-slate-300 mb-3">
                   Total Calculated Impact
@@ -962,40 +994,80 @@ export function EnvImpactCalculator({ onBackToHome: _ }: EnvImpactCalculatorProp
                     <h4 className="text-sm font-medium text-slate-300 mb-2">Distance Driven
                     </h4>
                     <p className="text-xl font-bold text-white">
-                      {aggregatedImpact.distance.toFixed(1)} miles
+                      {aggregatedImpact.distance.toFixed(1)} mi
                     </p>
                   </div>
+                </div>
+              </div>
+
+              {/* Equivalencies */}
+              <div className="mt-6">
+                <h3 className="text-lg font-medium text-slate-300 mb-3">
+                  <a
+                    href="https://www.epa.gov/energy/greenhouse-gas-equivalencies-calculator-calculations-and-references"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:underline"
+                  >
+                    Equivalent to Emissions from:
+                  </a>
+                </h3>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   <div className="bg-slate-700/50 rounded-lg p-4">
-                    <h4 className="text-sm font-medium text-slate-300 mb-2">Gas Consumed</h4>
-                    <p className="text-xl font-bold text-white">
-                      {aggregatedImpact.gas.toFixed(2)} L
-                    </p>
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <h4 className="text-sm font-medium text-slate-300 mb-2">Gas Consumed</h4>
+                        <p className="text-xl font-bold text-white">
+                          {aggregatedImpact.gas.toFixed(2)} L
+                        </p>
+                      </div>
+                      <Fuel size={40} className="text-slate-400" aria-hidden="true" />
+                    </div>
                   </div>
                   <div className="bg-slate-700/50 rounded-lg p-4">
-                    <h4 className="text-sm font-medium text-slate-300 mb-2">Coal Burned</h4>
-                    <p className="text-xl font-bold text-white">
-                      {aggregatedImpact.coal.toFixed(3)} kg
-                    </p>
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <h4 className="text-sm font-medium text-slate-300 mb-2">Coal Burned</h4>
+                        <p className="text-xl font-bold text-white">
+                          {aggregatedImpact.coal.toFixed(3)} kg
+                        </p>
+                      </div>
+                      <Factory size={40} className="text-slate-400" aria-hidden="true" />
+                    </div>
                   </div>
                   <div className="bg-slate-700/50 rounded-lg p-4">
-                    <h4 className="text-sm font-medium text-slate-300 mb-2">Number of Phones Charged</h4>
-                    <p className="text-xl font-bold text-white">
-                      {aggregatedImpact.phones.toFixed(0)}
-                    </p>
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <h4 className="text-sm font-medium text-slate-300 mb-2">Number of Phones Charged</h4>
+                        <p className="text-xl font-bold text-white">
+                          {aggregatedImpact.phones.toFixed(0)}
+                        </p>
+                      </div>
+                      <Smartphone size={40} className="text-slate-400" aria-hidden="true" />
+                    </div>
                   </div>
                 </div>
               </div>
 
               {/* Distance Comparison */}
               <div className="mt-6">
-                <h3 className="text-lg font-medium text-slate-300 mb-3">Distance Comparison</h3>
+                <h3 className="text-lg font-medium text-slate-300 mb-3">
+                  <a
+                    href="https://www.epa.gov/energy/greenhouse-gas-equivalencies-calculator-calculations-and-references"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:underline"
+                  >
+                    Equivalent to Emissions from Distance Driven:
+                  </a>
+                </h3>
                 <div className="bg-slate-700/50 rounded-lg p-4">
                   <h4 className="text-sm font-medium text-slate-300 mb-2">Comparable Distance</h4>
                   <p className="text-xl font-bold text-white">
                     {aggregatedImpact.distanceComparison}
                   </p>
                   <p className="text-sm text-slate-400 mt-1">
-                    Based on {aggregatedImpact.distance.toFixed(1)} km total distance
+                    Based on {aggregatedImpact.distance.toFixed(1)} mi total distance
                   </p>
                 </div>
               </div>
