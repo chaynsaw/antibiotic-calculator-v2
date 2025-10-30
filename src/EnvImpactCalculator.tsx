@@ -369,14 +369,17 @@ export function EnvImpactCalculator({ onBackToHome: _ }: EnvImpactCalculatorProp
       co2e = effectiveDays * baseData.co2ePerDOT; // Days x Column D x Frequency
     }
     const distance = (co2e) / 0.000391; // (Days x Column D) / 0.000391 (distance based on base CO2e)
-    const gas = co2e / 0.00887; // (Days * Column D * Frequency) / 0.00887
+    // Convert CO2e to equivalent gasoline consumed in liters.
+    // EPA factor ~8.887e-3 metric tons CO2 per gallon gasoline burned.
+    // First compute gallons, then convert to liters.
+    const gas = (co2e / 0.00887) * 3.78541;
     const coal = co2e / 0.000907; // (Days * Column D * Frequency) / 0.000907
     const phones = co2e / 0.0000151; // (Days * Column D * Frequency) / 0.0000151
     const distanceComparison = lookupDistanceComparison(distance);
 
     return {
       ...baseData,
-      waste: waste * .1, // Convert grams to kilograms
+      waste: waste / 1000, // Convert grams to kilograms
       co2e,
       distance,
       gas,
@@ -549,6 +552,20 @@ export function EnvImpactCalculator({ onBackToHome: _ }: EnvImpactCalculatorProp
     coal: totalCoal,
     phones: totalPhones,
     distanceComparison: lookupDistanceComparison(totalDistance)
+  };
+
+  // Map distance comparison labels to illustrative image URLs
+  const comparisonImageMap: Record<string, string> = {
+    // Use a single image for any football-field comparisons for now
+    football: './data/images/picture1.png',
+  };
+
+  const getComparisonImageUrl = (comparisonLabel?: string): string | null => {
+    if (!comparisonLabel) return null;
+    const normalized = comparisonLabel.toLowerCase();
+    // If label references football fields, return picture1
+    if (normalized.includes('football')) return comparisonImageMap.football;
+    return null;
   };
 
   return (
@@ -977,7 +994,7 @@ export function EnvImpactCalculator({ onBackToHome: _ }: EnvImpactCalculatorProp
                 <h3 className="text-lg font-medium text-slate-300 mb-3">
                   Total Calculated Impact
                 </h3>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="bg-slate-700/50 rounded-lg p-4">
                     <h4 className="text-sm font-medium text-slate-300 mb-2">Total Waste Generated</h4>
                     <p className="text-xl font-bold text-white">
@@ -988,13 +1005,6 @@ export function EnvImpactCalculator({ onBackToHome: _ }: EnvImpactCalculatorProp
                     <h4 className="text-sm font-medium text-slate-300 mb-2">Total CO2 Equivalent Emissions</h4>
                     <p className="text-xl font-bold text-white">
                       {aggregatedImpact.co2e.toExponential(3)} t
-                    </p>
-                  </div>
-                  <div className="bg-slate-700/50 rounded-lg p-4">
-                    <h4 className="text-sm font-medium text-slate-300 mb-2">Distance Driven
-                    </h4>
-                    <p className="text-xl font-bold text-white">
-                      {aggregatedImpact.distance.toFixed(1)} mi
                     </p>
                   </div>
                 </div>
@@ -1061,14 +1071,38 @@ export function EnvImpactCalculator({ onBackToHome: _ }: EnvImpactCalculatorProp
                     Equivalent to Emissions from Distance Driven:
                   </a>
                 </h3>
-                <div className="bg-slate-700/50 rounded-lg p-4">
-                  <h4 className="text-sm font-medium text-slate-300 mb-2">Comparable Distance</h4>
-                  <p className="text-xl font-bold text-white">
-                    {aggregatedImpact.distanceComparison}
-                  </p>
-                  <p className="text-sm text-slate-400 mt-1">
-                    Based on {aggregatedImpact.distance.toFixed(1)} mi total distance
-                  </p>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="bg-slate-700/50 rounded-lg p-4">
+                    <h4 className="text-sm font-medium text-slate-300 mb-2">Distance Driven</h4>
+                    <p className="text-xl font-bold text-white">
+                      {aggregatedImpact.distance.toFixed(1)} mi
+                    </p>
+                  </div>
+                  <div className="bg-slate-700/50 rounded-lg p-4 md:col-span-2">
+                    <h4 className="text-sm font-medium text-slate-300 mb-2">Comparable Distance</h4>
+                    <p className="text-xl font-bold text-white">
+                      {aggregatedImpact.distanceComparison}
+                    </p>
+                    <p className="text-sm text-slate-400 mt-1">
+                      Based on {aggregatedImpact.distance.toFixed(1)} mi total distance
+                    </p>
+                    {(() => {
+                      const imgUrl = getComparisonImageUrl(aggregatedImpact.distanceComparison);
+                      return imgUrl ? (
+                        <img
+                          src={imgUrl}
+                          alt="Illustration of comparable distance"
+                          className="mt-3 w-full max-h-48 object-contain rounded"
+                          onError={(e) => {
+                            const target = e.currentTarget as HTMLImageElement;
+                            if (target.src.indexOf('/images/Picture1.png') === -1) {
+                              target.src = '/images/Picture1.png';
+                            }
+                          }}
+                        />
+                      ) : null;
+                    })()}
+                  </div>
                 </div>
               </div>
             </div>
