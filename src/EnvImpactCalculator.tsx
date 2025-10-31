@@ -555,17 +555,29 @@ export function EnvImpactCalculator({ onBackToHome: _ }: EnvImpactCalculatorProp
   };
 
   // Map distance comparison labels to illustrative image URLs
+  // Use exact string matching to associate specific comparisons with images
   const comparisonImageMap: Record<string, string> = {
-    // Use a single image for any football-field comparisons for now
-    football: './data/images/picture1.png',
+    '< American Football Field Length': './data/images/picture1.png',
+    'Cruise Ship Length': './data/images/picture2.png',
+    'Standard Running Track Lap': './data/images/picture3.png',
+    'Lincoln Memorial Reflecting Pool Length': './data/images/picture4.png',
+    'Central Park Width': './data/images/picture5.png',
+    'Average Ride-Share Distance': './data/images/picture9.png',
+    '10K Race Distance': './data/images/picture11.png',
+    'Yosemite Valley Length': './data/images/picture13.png',
+    'Mount Everest Base Camp Trek': './data/images/picture35.png',
+    'Nile River Length': './data/images/picture102.png',
+    'Amazon River Length': './data/images/picture104.png',
+    'Earth Circumference': './data/images/picture143.png',
+    // Add more mappings here as images become available
+    // Example: 'Golden Gate Bridge Length': './data/images/golden-gate-bridge.png',
+    // Example: 'New York City → Boston': './data/images/nyc-boston.png',
   };
 
   const getComparisonImageUrl = (comparisonLabel?: string): string | null => {
     if (!comparisonLabel) return null;
-    const normalized = comparisonLabel.toLowerCase();
-    // If label references football fields, return picture1
-    if (normalized.includes('football')) return comparisonImageMap.football;
-    return null;
+    // Exact match lookup - if no match found, return null (no image)
+    return comparisonImageMap[comparisonLabel] || null;
   };
 
   return (
@@ -1071,28 +1083,25 @@ export function EnvImpactCalculator({ onBackToHome: _ }: EnvImpactCalculatorProp
                     Equivalent to Emissions from Distance Driven:
                   </a>
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="bg-slate-700/50 rounded-lg p-4">
-                    <h4 className="text-sm font-medium text-slate-300 mb-2">Distance Driven</h4>
-                    <p className="text-xl font-bold text-white">
-                      {aggregatedImpact.distance.toFixed(1)} mi
-                    </p>
-                  </div>
-                  <div className="bg-slate-700/50 rounded-lg p-4 md:col-span-2">
-                    <h4 className="text-sm font-medium text-slate-300 mb-2">Comparable Distance</h4>
-                    <p className="text-xl font-bold text-white">
-                      {aggregatedImpact.distanceComparison}
-                    </p>
-                    <p className="text-sm text-slate-400 mt-1">
-                      Based on {aggregatedImpact.distance.toFixed(1)} mi total distance
-                    </p>
+                <div className="bg-slate-700/50 rounded-lg p-4">
+                  <div className="flex items-start gap-4">
+                    <div className="text-left flex-1">
+                      <h4 className="text-sm font-medium text-slate-300 mb-2">Distance Driven</h4>
+                      <p className="text-xl font-bold text-white mb-4">
+                        {aggregatedImpact.distance.toFixed(1)} mi
+                      </p>
+                      <h4 className="text-sm font-medium text-slate-300 mb-2">Comparable Distance</h4>
+                      <p className="text-xl font-bold text-white">
+                        {aggregatedImpact.distanceComparison}
+                      </p>
+                    </div>
                     {(() => {
                       const imgUrl = getComparisonImageUrl(aggregatedImpact.distanceComparison);
                       return imgUrl ? (
                         <img
                           src={imgUrl}
                           alt="Illustration of comparable distance"
-                          className="mt-3 w-full max-h-48 object-contain rounded"
+                          className="flex-shrink-0 max-h-48 object-contain rounded"
                           onError={(e) => {
                             const target = e.currentTarget as HTMLImageElement;
                             if (target.src.indexOf('/images/Picture1.png') === -1) {
