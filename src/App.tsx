@@ -4,6 +4,7 @@ import { getWasteItems, getAvailableDrugs, type WasteItem, type DrugOption } fro
 import { Navbar } from "./Navbar";
 import { LandingPage } from "./LandingPage";
 import { EnvImpactCalculator } from "./EnvImpactCalculator";
+import { trackPageView } from "./utils/analytics";
 
 // Define types for regimen management
 interface Regimen {
@@ -67,6 +68,25 @@ export function App() {
       url.searchParams.set('page', activePage);
     }
     window.history.pushState({}, '', url.toString());
+  }, [activePage]);
+
+  // Track page views in Google Analytics
+  useEffect(() => {
+    const pageTitles: Record<string, string> = {
+      landing: 'Home',
+      calculator: 'Plastic Waste Calculator',
+      about: 'About Us',
+      envImpact: 'Environmental Impact Calculator',
+    };
+    
+    const pagePaths: Record<string, string> = {
+      landing: '/home',
+      calculator: '/plasticWasteCalculator',
+      about: '/about',
+      envImpact: '/envImpact',
+    };
+
+    trackPageView(pagePaths[activePage] || `/${activePage}`, pageTitles[activePage] || activePage);
   }, [activePage]);
 
   const [drugs, setDrugs] = useState<DrugOption[]>([]);
