@@ -4,6 +4,7 @@ import { getWasteItems, getAvailableDrugs, type WasteItem, type DrugOption } fro
 import { Navbar } from "./Navbar";
 import { LandingPage } from "./LandingPage";
 import { EnvImpactCalculator } from "./EnvImpactCalculator";
+import { Training } from "./Training";
 import { trackPageView } from "./utils/analytics";
 
 // Define types for regimen management
@@ -21,14 +22,14 @@ interface Regimen {
 }
 
 export function App() {
-  const [activePage, setActivePage] = useState<"landing" | "calculator" | "about" | "envImpact">("landing");
+  const [activePage, setActivePage] = useState<"landing" | "calculator" | "about" | "envImpact" | "training">("landing");
 
   // Handle URL search params for direct linking and browser navigation
   useEffect(() => {
     const handleNavigation = () => {
       const urlParams = new URLSearchParams(window.location.search);
       const page = urlParams.get('page');
-      if (page === 'plasticWasteCalculator' || page === 'about' || page === 'envImpact' || page === 'home') {
+      if (page === 'plasticWasteCalculator' || page === 'about' || page === 'envImpact' || page === 'training' || page === 'home') {
         if (page === 'plasticWasteCalculator') {
           setActivePage('calculator');
         } else if (page === 'envImpact') {
@@ -76,6 +77,7 @@ export function App() {
       landing: 'Home',
       calculator: 'Plastic Waste Calculator',
       about: 'About Us',
+      training: 'Training',
       envImpact: 'Environmental Impact Calculator',
     };
     
@@ -83,6 +85,7 @@ export function App() {
       landing: '/home',
       calculator: '/plasticWasteCalculator',
       about: '/about',
+      training: '/training',
       envImpact: '/envImpact',
     };
 
@@ -1091,6 +1094,7 @@ export function App() {
       {activePage === "envImpact" && (
         <EnvImpactCalculator onBackToHome={() => setActivePage("landing")} />
       )}
+      {activePage === "training" && <Training />}
       {activePage === "about" && (
         <div className="max-w-2xl mx-auto py-10 px-4">
           <img
@@ -1158,12 +1162,14 @@ export function App() {
           </div>
         </div>
       )}
+      {activePage !== "training" && (
       <footer className="py-4 px-6 text-center text-sm text-slate-400">
         <p>
           © 2025 Antibiotic Waste Calculator • Helping reduce environmental
           impact in healthcare
         </p>
       </footer>
+      )}
     </div>
   );
 }
