@@ -4,8 +4,8 @@ node_modules
 .pnp.js
 
 # Production build
-dist
-dist-ssr
+/dist
+/dist-ssr
 *.local
 
 # Testing
