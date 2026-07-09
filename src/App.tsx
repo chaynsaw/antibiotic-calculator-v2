@@ -1094,7 +1094,9 @@ export function App() {
       {activePage === "envImpact" && (
         <EnvImpactCalculator onBackToHome={() => setActivePage("landing")} />
       )}
-      {activePage === "training" && <Training />}
+      <div className={activePage === "training" ? "block" : "hidden"}>
+        <Training />
+      </div>
       {activePage === "about" && (
         <div className="max-w-2xl mx-auto py-10 px-4">
           <img
