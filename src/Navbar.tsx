@@ -75,4 +75,4 @@ export function Navbar({ active, onSelect }: NavbarProps) {
       </div>
     </nav>
   );
-} 
+}

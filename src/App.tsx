@@ -21,31 +21,60 @@ interface Regimen {
   showDetails: boolean;
 }
 
+type Page = "landing" | "calculator" | "about" | "envImpact" | "training";
+
+function getPageFromUrl(search = window.location.search): Page {
+  const page = new URLSearchParams(search).get("page");
+  if (page === "plasticWasteCalculator") return "calculator";
+  if (page === "envImpact") return "envImpact";
+  if (page === "training") return "training";
+  if (page === "about") return "about";
+  if (page === "home") return "landing";
+  return "landing";
+}
+
+function getUrlParamForPage(page: Page): string {
+  if (page === "landing") return "home";
+  if (page === "calculator") return "plasticWasteCalculator";
+  return page;
+}
+
+function openCalculatorWindow(page: "calculator" | "envImpact") {
+  const pageParam = getUrlParamForPage(page);
+  const windowName = page === "calculator" ? "plasticWasteCalculator" : "envImpactCalculator";
+  const url = `${window.location.origin}${window.location.pathname}?page=${pageParam}`;
+  const features =
+    "popup=yes,width=1100,height=900,left=80,top=60,menubar=no,toolbar=no,location=yes,status=yes,resizable=yes,scrollbars=yes";
+
+  const popup = window.open(url, windowName, features);
+  if (popup) {
+    // Named windows may already exist; force navigation to the calculator URL.
+    try {
+      popup.location.href = url;
+    } catch {
+      // Ignore cross-origin access errors; window.open already received the URL.
+    }
+    popup.focus();
+  }
+}
+
 export function App() {
-  const [activePage, setActivePage] = useState<"landing" | "calculator" | "about" | "envImpact" | "training">("landing");
+  const [activePage, setActivePage] = useState<Page>(() => getPageFromUrl());
+
+  const handleNavSelect = (page: Page) => {
+    if (activePage === "training" && (page === "calculator" || page === "envImpact")) {
+      openCalculatorWindow(page);
+      return;
+    }
+
+    setActivePage(page);
+  };
 
   // Handle URL search params for direct linking and browser navigation
   useEffect(() => {
     const handleNavigation = () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const page = urlParams.get('page');
-      if (page === 'plasticWasteCalculator' || page === 'about' || page === 'envImpact' || page === 'training' || page === 'home') {
-        if (page === 'plasticWasteCalculator') {
-          setActivePage('calculator');
-        } else if (page === 'envImpact') {
-          setActivePage('envImpact');
-        } else if (page === 'home') {
-          setActivePage('landing');
-        } else {
-          setActivePage(page);
-        }
-      } else {
-        setActivePage('landing');
-      }
+      setActivePage(getPageFromUrl());
     };
-
-    // Handle initial load
-    handleNavigation();
 
     // Handle browser back/forward navigation
     window.addEventListener('popstate', handleNavigation);
@@ -58,17 +87,12 @@ export function App() {
 
   // Update URL when page changes
   useEffect(() => {
+    const nextParam = getUrlParamForPage(activePage);
     const url = new URL(window.location.href);
-    if (activePage === 'landing') {
-      url.searchParams.set('page', 'home');
-    } else if (activePage === 'calculator') {
-      url.searchParams.set('page', 'plasticWasteCalculator');
-    } else if (activePage === 'envImpact') {
-      url.searchParams.set('page', 'envImpact');
-    } else {
-      url.searchParams.set('page', activePage);
-    }
-    window.history.pushState({}, '', url.toString());
+    if (url.searchParams.get("page") === nextParam) return;
+
+    url.searchParams.set("page", nextParam);
+    window.history.pushState({}, "", url.toString());
   }, [activePage]);
 
   // Track page views in Google Analytics
@@ -611,7 +635,7 @@ export function App() {
 
   return (
     <div className="bg-gradient-to-b from-slate-800 to-slate-900 min-h-screen text-white">
-      <Navbar active={activePage} onSelect={setActivePage} />
+      <Navbar active={activePage} onSelect={handleNavSelect} />
       {activePage === "calculator" && (
         <main className="px-6 md:px-12 pb-16">
           <div className="max-w-4xl mx-auto">
@@ -1087,12 +1111,12 @@ export function App() {
       )}
       {activePage === "landing" && (
         <LandingPage 
-          onGetStarted={() => setActivePage("calculator")} 
-          onEnvImpact={() => setActivePage("envImpact")} 
+          onGetStarted={() => handleNavSelect("calculator")} 
+          onEnvImpact={() => handleNavSelect("envImpact")} 
         />
       )}
       {activePage === "envImpact" && (
-        <EnvImpactCalculator onBackToHome={() => setActivePage("landing")} />
+        <EnvImpactCalculator onBackToHome={() => handleNavSelect("landing")} />
       )}
       <div className={activePage === "training" ? "block" : "hidden"}>
         <Training />
