@@ -590,6 +590,18 @@ export function EnvImpactCalculator({ onBackToHome: _ }: EnvImpactCalculatorProp
                 Environmental Impact Calculator
               </h1>
             </div>
+            <p className="text-slate-400 text-sm mb-2">
+              Created by L. Hojat and E. Spivak (
+              <a
+                href="https://doi.org/10.1093/ofid/ofaf308"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline text-blue-400 hover:text-blue-300"
+              >
+                https://doi.org/10.1093/ofid/ofaf308
+              </a>
+              )
+            </p>
             <p className="text-slate-300 text-lg max-w-4xl">
               A tool to help you calculate and compare environmental impact of antibiotic regimens.
             </p>
